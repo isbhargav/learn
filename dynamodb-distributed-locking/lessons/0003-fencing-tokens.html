@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 3 — Make stale writes lose</title>
+  <link rel="stylesheet" href="../assets/course.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">DynamoDB distributed locking · Lesson 3</div>
+    <h1>Make stale writes lose.</h1>
+    <p class="subtitle">Issue an increasing fencing token on every acquisition, then let the protected resource reject old holders.</p>
+    <div class="meta"><span>8 minutes</span><span>Python + boto3</span><span>3 retrieval checks</span></div>
+  </header>
+
+  <section class="goal">
+    <strong>Your win</strong>
+    <p>You will be able to generate a fencing token during lock acquisition and identify the resource-side check that actually makes fencing work.</p>
+  </section>
+
+  <h2>The resource must reject the past</h2>
+  <p>A random <code>OwnerID</code> distinguishes owners, but it does not establish which acquisition is newer. A <strong>fencing token</strong> is a number that increases on every successful acquisition.</p>
+  <p><a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html">Martin Kleppmann’s locking analysis</a> gives the key timeline: A acquires token 33 and pauses; B acquires token 34 and writes; A resumes and sends its delayed write with token 33. The resource remembers token 34 and rejects 33.</p>
+
+  <div class="warning">
+    <p><strong>Fencing is enforced by the protected resource.</strong> Generating a token in DynamoDB does nothing unless every protected operation carries it and the resource atomically rejects tokens older than the newest it has accepted.</p>
+  </div>
+
+  <h2>Increment the token inside acquisition</h2>
+  <p>DynamoDB <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html">update expressions</a> can increment a number atomically. <code>if_not_exists</code> initializes the counter on the first acquisition; <code>UPDATED_NEW</code> returns the token assigned to this winner.</p>
+
+  <pre><code>import time
+import uuid
+from boto3.dynamodb.conditions import Attr
+
+def acquire_fenced_lock(table, resource_name, ttl_seconds):
+    owner_id = str(uuid.uuid4())
+    now = int(time.time())
+    try:
+        response = table.update_item(
+            Key={"LockID": resource_name},
+            UpdateExpression=(
+                "SET OwnerID = :owner, ExpiresAt = :expiry, "
+                "FenceToken = if_not_exists(FenceToken, :zero) + :one"
+            ),
+            ConditionExpression=(
+                Attr("LockID").not_exists()
+                | Attr("ExpiresAt").lt(now)
+            ),
+            ExpressionAttributeValues={
+                ":owner": owner_id,
+                ":expiry": now + ttl_seconds,
+                ":zero": 0,
+                ":one": 1,
+            },
+            ReturnValues="UPDATED_NEW",
+        )
+        return {
+            "owner_id": owner_id,
+            "fence_token": int(response["Attributes"]["FenceToken"]),
+        }
+    except table.meta.client.exceptions.ConditionalCheckFailedException:
+        return None</code></pre>
+
+  <p>Pass <code>fence_token</code> with every protected write. The resource must compare the token and apply the write in one atomic operation; a separate “check, then write” leaves another race.</p>
+
+  <h2>Preserve the counter on release</h2>
+  <p>Lesson 1’s guarded delete is no longer suitable: deleting the item would delete the counter, allowing a later acquisition to start again at 1. Instead, release by expiring the item and removing its owner while retaining <code>FenceToken</code>.</p>
+
+  <pre><code>def release_fenced_lock(table, resource_name, owner_id):
+    try:
+        table.update_item(
+            Key={"LockID": resource_name},
+            UpdateExpression="SET ExpiresAt = :expired REMOVE OwnerID",
+            ConditionExpression=Attr("OwnerID").eq(owner_id),
+            ExpressionAttributeValues={":expired": 0},
+        )
+        return True
+    except table.meta.client.exceptions.ConditionalCheckFailedException:
+        return False</code></pre>
+
+  <div class="warning">
+    <p><strong>Do not use TTL to delete this fenced lock item.</strong> TTL cleanup would eventually erase the counter. The acquisition timestamp may be expired, but the fencing history must survive.</p>
+  </div>
+
+  <h2>Retrieve the fencing invariants</h2>
+  <section class="quiz" data-quiz
+    data-correct-feedback="Correct. The resource has accepted newer token 34, so token 33 is stale."
+    data-incorrect-feedback="Try again. Compare the arriving token with the newest token the resource has accepted.">
+    <h3>The resource accepted token 34. A delayed write arrives with token 33. What happens?</h3>
+    <div class="answers">
+      <button data-answer="incorrect">Resource accepts write</button>
+      <button data-answer="correct">Resource rejects write</button>
+      <button data-answer="incorrect">Resource retries write</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <section class="quiz" data-quiz
+    data-correct-feedback="Correct. The resource must actively compare tokens; clients and locks cannot stop every delayed request."
+    data-incorrect-feedback="Try again. Which component can reject the delayed write immediately before applying it?">
+    <h3>Which component must enforce fencing?</h3>
+    <div class="answers">
+      <button data-answer="incorrect">Client checks clocks</button>
+      <button data-answer="correct">Resource checks tokens</button>
+      <button data-answer="incorrect">Lock extends leases</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <section class="quiz" data-quiz
+    data-correct-feedback="Correct. Deleting the item would erase FenceToken and allow numbering to restart."
+    data-incorrect-feedback="Try again. Consider which attribute must survive every acquisition and release.">
+    <h3>Why does fenced release preserve the lock item?</h3>
+    <div class="answers">
+      <button data-answer="correct">Counter would reset</button>
+      <button data-answer="incorrect">Heartbeat would stop</button>
+      <button data-answer="incorrect">Owner would change</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <div class="note">
+    <p><strong>Design boundary:</strong> if your resource cannot atomically check fencing tokens, adding a counter to DynamoDB does not make stale writes safe. You must change the resource protocol or use a different coordination strategy.</p>
+  </div>
+
+  <section class="source">
+    <p><strong>Primary source:</strong> Read “Protecting a resource with a lock” and “Making the lock safe with fencing” in <a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html">Kleppmann’s article</a>. For a production lock-service precedent, see “sequencers” in §2.4 of the <a href="https://research.google/pubs/the-chubby-lock-service-for-loosely-coupled-distributed-systems/">Chubby paper</a>.</p>
+  </section>
+
+  <footer>
+    <p><a href="0002-lease-renewal.html">← Lesson 2</a> · Keep the <a href="../reference/fencing-tokens.html">fencing-token reference</a> nearby. Ask your teacher if the difference between OwnerID and FenceToken is not yet clear.</p>
+    <p><strong>Next:</strong> <a href="0004-resource-safety-strategies.html">Lesson 4: resource-safety strategies</a>—choose where correctness lives.</p>
+  </footer>
+</main>
+</body>
+</html>

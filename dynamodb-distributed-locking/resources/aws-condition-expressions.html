@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>DynamoDB condition expression CLI example - Amazon DynamoDB</title><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="assets_root" content="/assets" /><meta name="target_state" content="Expressions.ConditionExpressions" /><meta name="default_state" content="Expressions.ConditionExpressions" /><link rel="icon" type="image/ico" href="/assets/images/favicon.ico" /><link rel="shortcut icon" type="image/ico" href="/assets/images/favicon.ico" /><link rel="canonical" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" /><link rel="alternate" type="text/markdown" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.md" title="Markdown version" /><meta name="description" content="Condition expressions in DynamoDB allow you to specify conditions for read and write operations, enabling conditional puts, deletes, and updates to control data access and modification." /><meta name="deployment_region" content="IAD" /><meta name="product" content="Amazon DynamoDB" /><meta name="guide" content="Developer Guide" /><meta name="abstract" content="Amazon DynamoDB is a fast, fully managed NoSQL database as a service that makes it simple and cost-effective to store and retrieve any amount of data, and serve any level of request traffic." /><meta name="guide-locale" content="en_us" /><meta name="tocs" content="toc-contents.json" /><link rel="canonical" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" /><link rel="alternate" href="https://docs.aws.amazon.com/id_id/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="id-id" /><link rel="alternate" href="https://docs.aws.amazon.com/id_id/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="id" /><link rel="alternate" href="https://docs.aws.amazon.com/de_de/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="de-de" /><link rel="alternate" href="https://docs.aws.amazon.com/de_de/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="de" /><link rel="alternate" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="en-us" /><link rel="alternate" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="en" /><link rel="alternate" href="https://docs.aws.amazon.com/es_es/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="es-es" /><link rel="alternate" href="https://docs.aws.amazon.com/es_es/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="es" /><link rel="alternate" href="https://docs.aws.amazon.com/fr_fr/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="fr-fr" /><link rel="alternate" href="https://docs.aws.amazon.com/fr_fr/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="fr" /><link rel="alternate" href="https://docs.aws.amazon.com/it_it/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="it-it" /><link rel="alternate" href="https://docs.aws.amazon.com/it_it/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="it" /><link rel="alternate" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="ja-jp" /><link rel="alternate" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="ja" /><link rel="alternate" href="https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="ko-kr" /><link rel="alternate" href="https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="ko" /><link rel="alternate" href="https://docs.aws.amazon.com/pt_br/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="pt-br" /><link rel="alternate" href="https://docs.aws.amazon.com/pt_br/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="pt" /><link rel="alternate" href="https://docs.aws.amazon.com/zh_cn/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="zh-cn" /><link rel="alternate" href="https://docs.aws.amazon.com/zh_tw/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="zh-tw" /><link rel="alternate" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" hreflang="x-default" /><meta name="feedback-item" content="DynamoDB" /><meta name="this_doc_product" content="Amazon DynamoDB" /><meta name="this_doc_guide" content="Developer Guide" /><head xmlns="http://www.w3.org/1999/xhtml"> <script defer="" src="/assets/r/awsdocs-doc-page.2.0.0.js"></script><link href="/assets/r/awsdocs-doc-page.2.0.0.css" rel="stylesheet"/></head>
+<script defer="" id="awsc-panorama-bundle" type="text/javascript" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'dynamodb'}"></script><meta id="panorama-serviceSubSection" value="Developer Guide" /><meta id="panorama-serviceConsolePage" value="DynamoDB condition expression CLI example" /></head><body class="awsdocs awsui"><div class="awsdocs-container"><p><a href="Expressions.ConditionExpressions.md">View a markdown version of this page</a></p><awsdocs-header></awsdocs-header><awsui-app-layout id="app-layout" class="awsui-util-no-gutters" ng-controller="ContentController as $ctrl" header-selector="awsdocs-header" navigation-hide="false" navigation-width="$ctrl.navWidth" navigation-open="$ctrl.navOpen" navigation-change="$ctrl.onNavChange($event)" tools-hide="$ctrl.hideTools" tools-width="$ctrl.toolsWidth" tools-open="$ctrl.toolsOpen" tools-change="$ctrl.onToolsChange($event)"><div id="guide-toc" dom-region="navigation"><awsdocs-toc></awsdocs-toc></div><div id="main-column" dom-region="content" tabindex="-1"><awsdocs-view class="awsdocs-view"><div id="awsdocs-content"><head><title>DynamoDB condition expression CLI example - Amazon DynamoDB</title><meta name="pdf" content="/pdfs/amazondynamodb/latest/developerguide/dynamodb-dg.pdf#Expressions.ConditionExpressions" /><meta name="rss" content="dynamodbupdates.rss" /><meta name="forums" content="https://repost.aws/tags/TAljkKQ0MDQJCjDdxSeDQBJw" /><meta name="feedback" content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=DynamoDB&amp;topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" /><meta name="feedback-yes" content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" /><meta name="feedback-no" content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html" /><meta name="keywords" content="DynamoDB,Amazon DynamoDB,database,NoSQL database,nonrelational database,managed database,DynamoDB tables,DynamoDB table operations,DynamoDB table management,DynamoDB table items,DynamoDB indexes,DynamoDB global tables,DynamoDB transactions,DynamoDB Streams,Condition Expressions,Conditional Writes,Conditional Deletes,Conditional Updates" /><script type="application/ld+json">
+{
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Amazon DynamoDB",
+        "item" : "https://docs.aws.amazon.com/dynamodb/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Developer Guide",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Working with tables, items, queries, scans, and indexes",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithDynamo.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Working with items and attributes in DynamoDB",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Using expressions in DynamoDB",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 7,
+        "name" : "DynamoDB condition expression CLI example",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.html"
+      }
+    ]
+}
+</script></head><body><div id="main"><div style="display: none"><a href="/pdfs/amazondynamodb/latest/developerguide/dynamodb-dg.pdf#Expressions.ConditionExpressions" target="_blank" rel="noopener noreferrer" title="Open PDF"></a></div><div id="breadcrumbs" class="breadcrumb"><a href="/index.html">Documentation</a><a href="/dynamodb/index.html">Amazon DynamoDB</a><a href="Introduction.html">Developer Guide</a></div><div id="page-toc-src"><a href="#Expressions.ConditionExpressions.PreventingOverwrites">Conditional put</a><a href="#Expressions.ConditionExpressions.AdvancedComparisons">Conditional deletes</a><a href="#Expressions.ConditionExpressions.SimpleComparisons">Conditional updates</a><a href="#Expressions.ConditionExpressions.ConditionalExamples">Conditional expression examples</a></div><div id="main-content" class="awsui-util-container"><div id="main-col-body"><awsdocs-language-banner data-service="$ctrl.pageService"></awsdocs-language-banner><h1 class="topictitle" id="Expressions.ConditionExpressions">DynamoDB condition expression CLI example</h1><div class="awsdocs-page-header-container"><awsdocs-page-header></awsdocs-page-header><awsdocs-filter-selector id="awsdocs-filter-selector"></awsdocs-filter-selector></div><p>The following are some AWS Command Line Interface (AWS CLI) examples of using condition expressions. These
+		examples are based on the <code class="code">ProductCatalog</code> table, which was introduced in <a href="./Expressions.Attributes.html">Referring to item attributes when using expressions in DynamoDB</a>. The partition
+		key for this table is <code class="code">Id</code>; there is no sort key. The following
+			<code class="code">PutItem</code> operation creates a sample <code class="code">ProductCatalog</code> item that
+		the examples refer to.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb put-item \
+    --table-name ProductCatalog \
+    --item file://item.json</code></pre><p>The arguments for <code class="code">--item</code> are stored in the <code>item.json</code>
+		file. (For simplicity, only a few item attributes are used.)</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    "Id": <span>{</span>"N": "456" },
+    "ProductCategory": <span>{</span>"S": "Sporting Goods" },
+    "Price": <span>{</span>"N": "650" }
+}</code></pre><div class="highlights" id="inline-topiclist"><h6>Topics</h6><ul><li><p><a href="#Expressions.ConditionExpressions.PreventingOverwrites">Conditional put</a></p></li><li><p><a href="#Expressions.ConditionExpressions.AdvancedComparisons">Conditional deletes</a></p></li><li><p><a href="#Expressions.ConditionExpressions.SimpleComparisons">Conditional updates</a></p></li><li><p><a href="#Expressions.ConditionExpressions.ConditionalExamples">Conditional expression examples</a></p></li></ul></div>
+		<h2 id="Expressions.ConditionExpressions.PreventingOverwrites">Conditional put</h2>
+
+		<p>The <code class="code">PutItem</code> operation overwrites an item with the same primary key (if it
+			exists). If you want to avoid this, use a condition expression. This allows the write to
+			proceed only if the item in question does not already have the same primary key.</p>
+		<p>The following example uses <code class="code">attribute_not_exists()</code> to check whether an
+			item with the same primary key already exists before attempting the write. DynamoDB
+			evaluates a condition expression on a write operation against the item identified by the
+			request's key, so <code class="code">attribute_not_exists(Id)</code> is true only when no item with
+			that <code class="code">Id</code> value already exists. When it is true, the write proceeds; when an
+			item with that key already exists, the condition is false and DynamoDB rejects the
+			write, which prevents an overwrite.</p>
+		<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>For a table with a composite primary key (a partition key and a sort key), DynamoDB
+				still evaluates the condition against the single item identified by both key values.
+				Testing <code class="code">attribute_not_exists()</code> on a key attribute—for example
+					<code class="code">attribute_not_exists(pk)</code>—is true only when no item with that
+				partition key and sort key already exists, so it prevents overwriting that
+				item.</p></div></div>
+		<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb put-item \
+    --table-name ProductCatalog \
+    --item file://item.json \
+    --condition-expression "attribute_not_exists(Id)"</code></pre>
+		<p>If the condition expression evaluates to false, DynamoDB returns the following error
+			message: <strong class="errortext"><code>The conditional request failed</code></strong>.</p>
+		<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>For more information about <code class="code">attribute_not_exists</code> and other functions,
+				see <a href="./Expressions.OperatorsAndFunctions.html">Condition and filter expressions, operators, and functions in DynamoDB</a>.</p></div></div>
+	 
+		<h2 id="Expressions.ConditionExpressions.AdvancedComparisons">Conditional deletes</h2>
+
+		<p>To perform a conditional delete, you use a <code class="code">DeleteItem</code> operation with a
+			condition expression. The condition expression must evaluate to true in order for the
+			operation to succeed; otherwise, the operation fails.</p>
+		<p>Consider the item defined above.</p>
+		
+		<p>Suppose that you wanted to delete the item, but only under the following
+			conditions:</p>
+		<div class="itemizedlist">
+			 
+			 
+		<ul class="itemizedlist"><li class="listitem">
+				<p> The <code class="code">ProductCategory</code> is either "Sporting Goods" or "Gardening
+					Supplies."</p>
+			</li><li class="listitem">
+				<p> The <code class="code">Price</code> is between 500 and 600.</p>
+			</li></ul></div>
+		<p>The following example tries to delete the item.</p>
+
+		<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb delete-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"456"}}' \
+    --condition-expression "(ProductCategory IN (:cat1, :cat2)) and (Price between :lo and :hi)" \
+    --expression-attribute-values file://values.json</code></pre>
+		<p>The arguments for <code class="code">--expression-attribute-values</code> are stored in the
+				<code>values.json</code> file.</p>
+		<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    ":cat1": <span>{</span>"S": "Sporting Goods"},
+    ":cat2": <span>{</span>"S": "Gardening Supplies"},
+    ":lo": <span>{</span>"N": "500"},
+    ":hi": <span>{</span>"N": "600"}
+}</code></pre>
+		<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>In the condition expression, the <code class="code">:</code> (colon character) indicates an
+					<em>expression attribute value</em>—a placeholder for an
+				actual value. For more information, see <a href="./Expressions.ExpressionAttributeValues.html">Using expression attribute values in DynamoDB</a>.</p><p>For more information about <code class="code">IN</code>, <code class="code">AND</code>, and other keywords,
+				see <a href="./Expressions.OperatorsAndFunctions.html">Condition and filter expressions, operators, and functions in DynamoDB</a>.</p></div></div>
+		<p>In this example, the <code class="code">ProductCategory</code> comparison evaluates to true, but
+			the <code class="code">Price</code> comparison evaluates to false. This causes the condition
+			expression to evaluate to false and the <code class="code">DeleteItem</code> operation to
+			fail.</p>
+	 
+		<h2 id="Expressions.ConditionExpressions.SimpleComparisons">Conditional updates</h2>
+
+		<p>To perform a conditional update, you use an <code class="code">UpdateItem</code> operation with a
+			condition expression. The condition expression must evaluate to true in order for the
+			operation to succeed; otherwise, the operation fails.</p>
+		<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p><code class="code">UpdateItem</code> also supports <em>update expressions</em>,
+				where you specify the modifications you want to make to an item. For more
+				information, see <a href="./Expressions.UpdateExpressions.html">Using update expressions in DynamoDB</a>.</p></div></div>
+		<p>Suppose that you started with the item defined above.</p>
+		
+		<p>The following example performs an <code class="code">UpdateItem</code> operation. It tries to
+			reduce the <code class="code">Price</code> of a product by 75—but the condition expression
+			prevents the update if the current <code class="code">Price</code> is less than or equal to
+			500.</p>
+
+		<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id": <span>{</span>"N": "456"}}' \
+    --update-expression "SET Price = Price - :discount" \
+    --condition-expression "Price &gt; :limit" \
+    --expression-attribute-values file://values.json</code></pre>
+
+		<p>The arguments for <code class="code">--expression-attribute-values</code> are stored in the
+				<code>values.json</code> file.</p>
+		<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    ":discount": <span>{</span> "N": "75"},
+    ":limit": <span>{</span>"N": "500"}
+}</code></pre>
+		<p>If the starting <code class="code">Price</code> is 650, the <code class="code">UpdateItem</code> operation
+			reduces the <code class="code">Price</code> to 575. If you run the <code class="code">UpdateItem</code> operation
+			again, the <code class="code">Price</code> is reduced to 500. If you run it a third time, the
+			condition expression evaluates to false, and the update fails.</p>
+		<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>In the condition expression, the <code class="code">:</code> (colon character) indicates an
+					<em>expression attribute value</em>—a placeholder for an
+				actual value. For more information, see <a href="./Expressions.ExpressionAttributeValues.html">Using expression attribute values in DynamoDB</a>.</p><p>For more information about "<em>&gt;</em>" and other operators, see
+					<a href="./Expressions.OperatorsAndFunctions.html">Condition and filter expressions, operators, and functions in DynamoDB</a>.</p></div></div>
+	 
+		<h2 id="Expressions.ConditionExpressions.ConditionalExamples">Conditional expression examples</h2>
+		<p>For more information about the functions used in the following examples, see <a href="./Expressions.OperatorsAndFunctions.html">Condition and filter expressions, operators, and functions in DynamoDB</a>. If you want to know more about
+			how to specify different attribute types in an expression, see <a href="./Expressions.Attributes.html">Referring to item attributes when using expressions in DynamoDB</a>. </p>
+		 
+			<h3 id="Expressions.ConditionExpressions.CheckingForAttributes">Checking for attributes in an item</h3>
+
+
+			<p>You can check for the existence (or nonexistence) of any attribute. If the
+				condition expression evaluates to true, the operation succeeds; otherwise, it
+				fails.</p>
+			<p>The following example uses <code class="code">attribute_not_exists</code> to delete a product
+				only if it does not have a <code class="code">Price</code> attribute.</p>
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb delete-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id": <span>{</span>"N": "456"}}' \
+    --condition-expression "attribute_not_exists(Price)"</code></pre>
+			<p>DynamoDB also provides an <code class="code">attribute_exists</code> function. The following
+				example deletes a product only if it has received poor reviews.</p>
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb delete-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id": <span>{</span>"N": "456"}}' \
+    --condition-expression "attribute_exists(ProductReviews.OneStar)"</code></pre>
+		 
+
+		 
+			<h3 id="Expressions.ConditionExpressions.CheckingForAttributeType">Checking for attribute type</h3>
+
+
+			<p>You can check the data type of an attribute value by using the
+					<code class="code">attribute_type</code> function. If the condition expression evaluates to
+				true, the operation succeeds; otherwise, it fails.</p>
+
+			<p>The following example uses <code class="code">attribute_type</code> to delete a product only if
+				it has a <code class="code">Color</code> attribute of type String Set. </p>
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb delete-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id": <span>{</span>"N": "456"}}' \
+    --condition-expression "attribute_type(Color, :v_sub)" \
+    --expression-attribute-values file://expression-attribute-values.json</code></pre>
+
+			<p>The arguments for <code class="code">--expression-attribute-values</code> are stored in the
+				expression-attribute-values.json file.</p>
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    ":v_sub":<span>{</span>"S":"SS"}
+}</code></pre>
+
+		 
+		 
+			<h3 id="Expressions.ConditionExpressions.CheckingBeginsWith">Checking string starting value</h3>
+
+
+			<p>You can check if a String attribute value begins with a particular substring by
+				using the <code class="code">begins_with</code> function. If the condition expression evaluates
+				to true, the operation succeeds; otherwise, it fails. </p>
+
+			<p>The following example uses <code class="code">begins_with</code> to delete a product only if
+				the <code class="code">FrontView</code> element of the <code class="code">Pictures</code> map starts with a
+				specific value.</p>
+
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb delete-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id": <span>{</span>"N": "456"}}' \
+    --condition-expression "begins_with(Pictures.FrontView, :v_sub)" \
+    --expression-attribute-values file://expression-attribute-values.json</code></pre>
+			<p>The arguments for <code class="code">--expression-attribute-values</code> are stored in the
+				expression-attribute-values.json file.</p>
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    ":v_sub":<span>{</span>"S":"http://"}
+}</code></pre>
+
+		 
+		 
+			<h3 id="Expressions.ConditionExpressions.CheckingForContains">Checking for an element in a set</h3>
+
+
+			<p>You can check for an element in a set or look for a substring within a string by
+				using the <code class="code">contains</code> function. If the condition expression evaluates to
+				true, the operation succeeds; otherwise, it fails. </p>
+
+			<p>The following example uses <code class="code">contains</code> to delete a product only if the
+					<code class="code">Color</code> String Set has an element with a specific value. </p>
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb delete-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id": <span>{</span>"N": "456"}}' \
+    --condition-expression "contains(Color, :v_sub)" \
+    --expression-attribute-values file://expression-attribute-values.json</code></pre>
+			<p>The arguments for <code class="code">--expression-attribute-values</code> are stored in the
+				expression-attribute-values.json file.</p>
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    ":v_sub":<span>{</span>"S":"Red"}
+}</code></pre>
+
+		 
+		 
+			<h3 id="Expressions.ConditionExpressions.CheckingForSize">Checking the size of an attribute value</h3>
+
+
+			<p>You can check for the size of an attribute value by using the <code class="code">size</code>
+				function. If the condition expression evaluates to true, the operation succeeds;
+				otherwise, it fails. </p>
+
+			<p>The following example uses <code class="code">size</code> to delete a product only if the size
+				of the <code class="code">VideoClip</code> Binary attribute is greater than <code class="code">64000</code>
+				bytes. </p>
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb delete-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id": <span>{</span>"N": "456"}}' \
+    --condition-expression "size(VideoClip) &gt; :v_sub" \
+    --expression-attribute-values file://expression-attribute-values.json</code></pre>
+			<p>The arguments for <code class="code">--expression-attribute-values</code> are stored in the
+				expression-attribute-values.json file.</p>
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    ":v_sub":<span>{</span>"N":"64000"}
+}</code></pre>
+
+		 
+
+	<awsdocs-copyright class="copyright-print"></awsdocs-copyright><awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}"></awsdocs-thumb-feedback></div><noscript><div><div><div><div id="js_error_message"><p><img src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png" alt="Warning" /> <strong>Javascript is disabled or is unavailable in your browser.</strong></p><p>To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.</p></div></div></div></div></noscript><div id="main-col-footer" class="awsui-util-font-size-0"><div id="doc-conventions"><a target="_top" href="/general/latest/gr/docconventions.html">Document Conventions</a></div><div class="prev-next"><div id="previous" class="prev-link" accesskey="p" href="./Expressions.OperatorsAndFunctions.html">Condition and filter expressions</div><div id="next" class="next-link" accesskey="n" href="./TTL.html">Time to Live (TTL)</div></div></div><awsdocs-page-utilities></awsdocs-page-utilities></div><div id="quick-feedback-yes" style="display: none;"><div class="title">Did this page help you? - Yes</div><div class="content"><p>Thanks for letting us know we're doing a good job!</p><p>If you've got a moment, please tell us what we did right so we can do more of it.</p><p><awsui-button id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback" click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=DynamoDB&amp;topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html"></awsui-button></p></div></div><div id="quick-feedback-no" style="display: none;"><div class="title">Did this page help you? - No</div><div class="content"><p>Thanks for letting us know this page needs work. We're sorry we let you down.</p><p>If you've got a moment, please tell us how we can make the documentation better.</p><p><awsui-button id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback" click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=DynamoDB&amp;topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html"></awsui-button></p></div></div></div></body></div></awsdocs-view><div class="page-loading-indicator" id="page-loading-indicator"><awsui-spinner size="large"></awsui-spinner></div></div><div id="tools-panel" dom-region="tools"><awsdocs-tools-panel id="awsdocs-tools-panel"></awsdocs-tools-panel></div></awsui-app-layout><awsdocs-cookie-banner class="doc-cookie-banner"></awsdocs-cookie-banner></div></body></html>

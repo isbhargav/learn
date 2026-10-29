@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lease renewal — quick reference</title>
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Quick reference</div>
+    <h1>Lease renewal</h1>
+    <p class="subtitle">A heartbeat extends a live lease owned by the same acquisition token. It never resurrects an expired lease.</p>
+  </header>
+
+  <h2>Guarded update</h2>
+  <table>
+    <thead><tr><th>Part</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td>Ownership</td><td><code>OwnerID = :owner</code></td></tr>
+      <tr><td>Validity</td><td><code>ExpiresAt &gt; :now</code></td></tr>
+      <tr><td>Extension</td><td><code>ExpiresAt = :now + lease_duration</code></td></tr>
+      <tr><td>Timing</td><td>Heartbeat period comfortably below lease duration</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Result handling</h2>
+  <table>
+    <thead><tr><th>Result</th><th>Meaning</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td>Update succeeds</td><td>Lease extended</td><td>Continue protected work</td></tr>
+      <tr><td>Condition fails</td><td>Not owned or no longer valid</td><td>Stop protected work</td></tr>
+      <tr><td>Other AWS error</td><td>Renewal not confirmed</td><td>Handle before the deadline; never assume success</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning">
+    <p><strong>Heartbeats reduce exposure; they do not provide fencing.</strong> A process pause stops the heartbeat but not the passage of time. Once the lease expires, another caller can acquire while the paused holder still has unfinished work.</p>
+  </div>
+  <div class="note">
+    <p>AWS’s example pairs a 10-second lease with a 3-second heartbeat. Treat this as an example configuration, then choose and test values for your own latency, pause, and clock-skew budget.</p>
+  </div>
+
+  <footer>
+    <p>Sources: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html">AWS distributed locking guide</a> · <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html">Condition expressions</a></p>
+    <p><a href="../lessons/0002-lease-renewal.html">Lesson 2: Lease renewal</a> · <a href="lock-protocol.html">Core lock protocol</a></p>
+  </footer>
+</main>
+</body>
+</html>

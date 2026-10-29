@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fencing tokens — quick reference</title>
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Quick reference</div>
+    <h1>Fencing tokens</h1>
+    <p class="subtitle">An increasing acquisition number lets the protected resource reject delayed work from an older lock holder.</p>
+  </header>
+
+  <h2>Five required invariants</h2>
+  <ol>
+    <li>Each successful acquisition atomically receives a token greater than every earlier token for that resource.</li>
+    <li>Every protected operation carries its acquisition’s token.</li>
+    <li>The resource remembers the newest token it has accepted.</li>
+    <li>The resource atomically rejects an older token while applying the protected operation.</li>
+    <li>The token counter survives release, expiry, and lock-table cleanup.</li>
+  </ol>
+
+  <h2>Two different identifiers</h2>
+  <table>
+    <thead><tr><th>Identifier</th><th>Ordered?</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>OwnerID</code></td><td>No</td><td>Ensure heartbeat and release affect only the same acquisition.</td></tr>
+      <tr><td><code>FenceToken</code></td><td>Yes</td><td>Let the protected resource reject older acquisitions.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Resource-side decision</h2>
+  <div class="diagram" aria-label="Fencing decision">
+    <div class="state">Write arrives<br>with token 33</div><div class="arrow">→</div>
+    <div class="state">Newest accepted<br>is token 34</div><div class="arrow">→</div>
+    <div class="state">Reject atomically<br>33 &lt; 34</div>
+  </div>
+
+  <div class="warning">
+    <p><strong>A client-side token check is not fencing.</strong> The resource receiving the operation must enforce it. Checking then writing in separate operations is also insufficient.</p>
+  </div>
+  <div class="note">
+    <p>Fencing orders different acquisitions. Duplicate requests carrying the same token still require an idempotency design where duplicate effects matter.</p>
+  </div>
+
+  <h2>When the resource cannot check tokens</h2>
+  <table>
+    <thead><tr><th>Strategy</th><th>Use when</th><th>Boundary</th></tr></thead>
+    <tbody>
+      <tr><td>Resource-side compare-and-swap</td><td>The resource supports an expected-version precondition, such as S3 <code>If-Match</code>.</td><td>Every writer must use the precondition; this prevents overwriting a changed version rather than ordering arbitrary tokens.</td></tr>
+      <tr><td>Atomic transaction</td><td>The data and highest token/version can live in one transactional store.</td><td>The check and protected write must commit together; DynamoDB transactions are Regional.</td></tr>
+      <tr><td>Single-writer gateway</td><td>All operations can pass through one sequencing component.</td><td>No bypass paths; gateway failover must preserve ordering and prevent two active writers.</td></tr>
+      <tr><td>Idempotent operations</td><td>Repeating the same logical operation can be made harmless.</td><td>Deduplication handles repeated effects, not arbitrary stale or conflicting writes.</td></tr>
+      <tr><td>Best-effort lock</td><td>The lock exists only to save duplicated effort or cost.</td><td>Unsuitable when overlap can corrupt state or violate an invariant.</td></tr>
+    </tbody>
+  </table>
+  <div class="warning">
+    <p><strong>Timing changes are only mitigations.</strong> Longer leases, more heartbeats, and Chubby-style lock-delay can reduce stale-request probability, but cannot establish correctness under arbitrary pauses or delays. Changing lock stores alone also does not remove the resource-enforcement boundary.</p>
+  </div>
+
+  <footer>
+    <p>Sources: <a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html">Kleppmann on distributed locking</a> · <a href="https://research.google/pubs/the-chubby-lock-service-for-loosely-coupled-distributed-systems/">Chubby, §2.4</a> · <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html">DynamoDB transactions</a> · <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes.html">S3 conditional writes</a></p>
+    <p><a href="../lessons/0003-fencing-tokens.html">Lesson 3: Fencing tokens</a> · <a href="lock-protocol.html">Core lock protocol</a></p>
+  </footer>
+</main>
+</body>
+</html>

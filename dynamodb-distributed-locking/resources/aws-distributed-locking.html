@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Distributed locking with the DynamoDB Lock Client - Amazon DynamoDB</title><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="assets_root" content="/assets" /><meta name="target_state" content="BestPractices_DistributedLocking" /><meta name="default_state" content="BestPractices_DistributedLocking" /><link rel="icon" type="image/ico" href="/assets/images/favicon.ico" /><link rel="shortcut icon" type="image/ico" href="/assets/images/favicon.ico" /><link rel="canonical" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" /><link rel="alternate" type="text/markdown" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.md" title="Markdown version" /><meta name="description" content="For applications that require traditional lock-acquire-release semantics, the DynamoDB Lock Client is an open-source library that implements distributed locking using a DynamoDB table as the lock store. This approach is useful when you need to coordinate access to an external resource (such as an S3 object or a shared configuration) across multiple application instances." /><meta name="deployment_region" content="IAD" /><meta name="product" content="Amazon DynamoDB" /><meta name="guide" content="Developer Guide" /><meta name="abstract" content="Amazon DynamoDB is a fast, fully managed NoSQL database as a service that makes it simple and cost-effective to store and retrieve any amount of data, and serve any level of request traffic." /><meta name="guide-locale" content="en_us" /><meta name="tocs" content="toc-contents.json" /><link rel="canonical" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" /><link rel="alternate" href="https://docs.aws.amazon.com/id_id/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="id-id" /><link rel="alternate" href="https://docs.aws.amazon.com/id_id/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="id" /><link rel="alternate" href="https://docs.aws.amazon.com/de_de/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="de-de" /><link rel="alternate" href="https://docs.aws.amazon.com/de_de/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="de" /><link rel="alternate" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="en-us" /><link rel="alternate" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="en" /><link rel="alternate" href="https://docs.aws.amazon.com/es_es/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="es-es" /><link rel="alternate" href="https://docs.aws.amazon.com/es_es/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="es" /><link rel="alternate" href="https://docs.aws.amazon.com/fr_fr/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="fr-fr" /><link rel="alternate" href="https://docs.aws.amazon.com/fr_fr/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="fr" /><link rel="alternate" href="https://docs.aws.amazon.com/it_it/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="it-it" /><link rel="alternate" href="https://docs.aws.amazon.com/it_it/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="it" /><link rel="alternate" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="ja-jp" /><link rel="alternate" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="ja" /><link rel="alternate" href="https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="ko-kr" /><link rel="alternate" href="https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="ko" /><link rel="alternate" href="https://docs.aws.amazon.com/pt_br/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="pt-br" /><link rel="alternate" href="https://docs.aws.amazon.com/pt_br/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="pt" /><link rel="alternate" href="https://docs.aws.amazon.com/zh_cn/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="zh-cn" /><link rel="alternate" href="https://docs.aws.amazon.com/zh_tw/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="zh-tw" /><link rel="alternate" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" hreflang="x-default" /><meta name="feedback-item" content="DynamoDB" /><meta name="this_doc_product" content="Amazon DynamoDB" /><meta name="this_doc_guide" content="Developer Guide" /><head xmlns="http://www.w3.org/1999/xhtml"> <script defer="" src="/assets/r/awsdocs-doc-page.2.0.0.js"></script><link href="/assets/r/awsdocs-doc-page.2.0.0.css" rel="stylesheet"/></head>
+<script defer="" id="awsc-panorama-bundle" type="text/javascript" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'dynamodb'}"></script><meta id="panorama-serviceSubSection" value="Developer Guide" /><meta id="panorama-serviceConsolePage" value="Distributed locking with the DynamoDB Lock Client" /></head><body class="awsdocs awsui"><div class="awsdocs-container"><p><a href="BestPractices_DistributedLocking.md">View a markdown version of this page</a></p><awsdocs-header></awsdocs-header><awsui-app-layout id="app-layout" class="awsui-util-no-gutters" ng-controller="ContentController as $ctrl" header-selector="awsdocs-header" navigation-hide="false" navigation-width="$ctrl.navWidth" navigation-open="$ctrl.navOpen" navigation-change="$ctrl.onNavChange($event)" tools-hide="$ctrl.hideTools" tools-width="$ctrl.toolsWidth" tools-open="$ctrl.toolsOpen" tools-change="$ctrl.onToolsChange($event)"><div id="guide-toc" dom-region="navigation"><awsdocs-toc></awsdocs-toc></div><div id="main-column" dom-region="content" tabindex="-1"><awsdocs-view class="awsdocs-view"><div id="awsdocs-content"><head><title>Distributed locking with the DynamoDB Lock Client - Amazon DynamoDB</title><meta name="pdf" content="/pdfs/amazondynamodb/latest/developerguide/dynamodb-dg.pdf#BestPractices_DistributedLocking" /><meta name="rss" content="dynamodbupdates.rss" /><meta name="forums" content="https://repost.aws/tags/TAljkKQ0MDQJCjDdxSeDQBJw" /><meta name="feedback" content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=DynamoDB&amp;topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" /><meta name="feedback-yes" content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" /><meta name="feedback-no" content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html" /><meta name="keywords" content="DynamoDB,Amazon DynamoDB,database,NoSQL database,nonrelational database,managed database,NoSQL,Best Practices,Database Design,Performance,Cost Optimization,Data Modeling,Partitioning,Indexing,NoSQL Workbench,implementing version control,advanced design patterns,optimistic locking,pessimistic locking,concurrency control,DynamoDB transactions locking,DynamoDB lock client" /><script type="application/ld+json">
+{
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Amazon DynamoDB",
+        "item" : "https://docs.aws.amazon.com/dynamodb/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Developer Guide",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Best practices for designing and architecting with DynamoDB",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Best practices for handling concurrent updates in DynamoDB",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_ImplementingVersionControl.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Distributed locking with the DynamoDB Lock Client",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_ImplementingVersionControl.html"
+      }
+    ]
+}
+</script></head><body><div id="main"><div style="display: none"><a href="/pdfs/amazondynamodb/latest/developerguide/dynamodb-dg.pdf#BestPractices_DistributedLocking" target="_blank" rel="noopener noreferrer" title="Open PDF"></a></div><div id="breadcrumbs" class="breadcrumb"><a href="/index.html">Documentation</a><a href="/dynamodb/index.html">Amazon DynamoDB</a><a href="Introduction.html">Developer Guide</a></div><div id="page-toc-src"><a href="#BestPractices_DistributedLocking_HowItWorks">How it works</a><a href="#BestPractices_DistributedLocking_WhenToUse">When to use the lock client</a><a href="#BestPractices_DistributedLocking_Tradeoffs">Tradeoffs</a><a href="#BestPractices_DistributedLocking_Implementation">Implementation</a></div><div id="main-content" class="awsui-util-container"><div id="main-col-body"><awsdocs-language-banner data-service="$ctrl.pageService"></awsdocs-language-banner><h1 class="topictitle" id="BestPractices_DistributedLocking">Distributed locking with the DynamoDB Lock Client</h1><div class="awsdocs-page-header-container"><awsdocs-page-header></awsdocs-page-header><awsdocs-filter-selector id="awsdocs-filter-selector"></awsdocs-filter-selector></div><p>For applications that require traditional lock-acquire-release semantics, the DynamoDB Lock
+   Client is an open-source library that implements distributed locking using a DynamoDB table as the
+   lock store. This approach is useful when you need to coordinate access to an external resource
+   (such as an S3 object or a shared configuration) across multiple application instances.</p><p>The lock client is available as an open-source <a href="https://github.com/awslabs/amazon-dynamodb-lock-client" rel="noopener noreferrer" target="_blank"><span>Java library</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>.</p>
+   <h2 id="BestPractices_DistributedLocking_HowItWorks">How it works</h2>
+   <p>The lock client uses a dedicated DynamoDB table to track locks. Each lock is represented as an
+    item with the following key attributes:</p>
+   <div class="itemizedlist">
+     
+     
+     
+   <ul class="itemizedlist"><li class="listitem"><p>A partition key that identifies the resource being locked.</p></li><li class="listitem"><p>A lease duration that specifies how long the lock is valid. If the lock holder
+     crashes or becomes unresponsive, the lock automatically expires after the lease
+     duration.</p></li><li class="listitem"><p>A heartbeat that the lock holder sends periodically to extend the lease. This
+     prevents the lock from expiring while the holder is still actively processing.</p></li></ul></div>
+   <p>The lock client uses conditional writes to make sure that only one process can acquire a lock
+    at a time. If a lock is already held, the caller can choose to wait and retry or fail
+    immediately.</p>
+   
+   <h2 id="BestPractices_DistributedLocking_WhenToUse">When to use the lock client</h2>
+   <p>The lock client is a good fit when:</p>
+   <div class="itemizedlist">
+     
+     
+     
+   <ul class="itemizedlist"><li class="listitem"><p>You need to coordinate access to a shared resource across multiple application
+     instances or microservices.</p></li><li class="listitem"><p>The critical section is long-running (seconds to minutes) and retrying the
+     entire operation on conflict would be expensive.</p></li><li class="listitem"><p>You need automatic lock expiry to handle process failures
+     gracefully.</p></li></ul></div>
+   <p>Common examples include orchestrating distributed workflows, coordinating cron jobs across
+    multiple instances, and managing access to shared external resources.</p>
+   
+   <h2 id="BestPractices_DistributedLocking_Tradeoffs">Tradeoffs</h2>
+   <div class="variablelist">
+     
+     
+     
+   <dl>
+     <dt><span class="term"><b>Additional infrastructure</b></span></dt>
+     <dd><p>Requires a dedicated DynamoDB table for lock management, with additional read and
+      write capacity for lock operations and heartbeats.</p></dd>
+     
+     <dt><span class="term"><b>Clock dependency</b></span></dt>
+     <dd><p>Lock expiry relies on timestamps. Significant clock skew between clients can
+      cause unexpected behavior, particularly for short lease durations.</p></dd>
+     
+     <dt><span class="term"><b>Deadlock risk</b></span></dt>
+     <dd><p>If your application acquires locks on multiple resources, you must acquire them
+      in a consistent order to avoid deadlocks. The lease duration provides a safety net by
+      automatically releasing locks from unresponsive holders.</p></dd>
+    </dl></div>
+   
+   <h2 id="BestPractices_DistributedLocking_Implementation">Implementation</h2>
+   <p>The following example shows how to use the DynamoDB Lock Client to acquire and release a
+    lock:</p>
+
+   <pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (java)--><code class="java ">import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+
+final DynamoDbClient dynamoDB = DynamoDbClient.builder()
+    .region(Region.US_WEST_2)
+    .build();
+
+final AmazonDynamoDBLockClient lockClient = new AmazonDynamoDBLockClient(
+    AmazonDynamoDBLockClientOptions.builder(dynamoDB, "Locks")
+        .withTimeUnit(TimeUnit.SECONDS)
+        .withLeaseDuration(10L)
+        .withHeartbeatPeriod(3L)
+        .withCreateHeartbeatBackgroundThread(true)
+        .build());
+
+// Try to acquire a lock on a resource
+final Optional&lt;LockItem&gt; lock =
+    lockClient.tryAcquireLock(AcquireLockOptions.builder("my-shared-resource").build());
+
+if (lock.isPresent()) <span>{</span>
+    try <span>{</span>
+        // Perform operations that require exclusive access
+        processSharedResource();
+    } finally <span>{</span>
+        // Always release the lock when done
+        lockClient.releaseLock(lock.get());
+    }
+} else <span>{</span>
+    System.out.println("Failed to acquire lock.");
+}
+
+lockClient.close();</code></pre>
+
+   <div class="awsdocs-note awsdocs-important"><div class="awsdocs-note-title"><awsui-icon name="status-warning" variant="error"></awsui-icon><h6>Important</h6></div><div class="awsdocs-note-text"><p>Always release locks in a <code class="code">finally</code> block to make sure locks are released even if
+     your processing logic throws an exception. Unreleased locks block other processes until the
+     lease expires.</p></div></div>
+
+   <p>You can also implement a simple locking mechanism without the lock client library by using
+    conditional writes directly. The following example uses <code class="code">UpdateItem</code> with a condition
+    expression to acquire a lock, and <code class="code">DeleteItem</code> to release it:</p>
+
+   <pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli ()--><code class="">from datetime import datetime, timedelta
+from boto3.dynamodb.conditions import Attr
+
+def acquire_lock(table, resource_name, owner_id, ttl_seconds):
+    """Attempt to acquire a lock. Returns True if successful."""
+    expiry = (datetime.now() + timedelta(seconds=ttl_seconds)).isoformat()
+    now = datetime.now().isoformat()
+    try:
+        table.update_item(
+            Key=<span>{</span>'LockID': resource_name},
+            UpdateExpression='SET #owner = :owner, #expiry = :expiry',
+            ConditionExpression=Attr('LockID').not_exists() | Attr('ExpiresAt').lt(now),
+            ExpressionAttributeNames=<span>{</span>'#owner': 'OwnerID', '#expiry': 'ExpiresAt'},
+            ExpressionAttributeValues=<span>{</span>':owner': owner_id, ':expiry': expiry}
+        )
+        return True
+    except table.meta.client.exceptions.ConditionalCheckFailedException:
+        return False
+
+def release_lock(table, resource_name, owner_id):
+    """Release a lock. Only succeeds if the caller is the lock owner."""
+    try:
+        table.delete_item(
+            Key=<span>{</span>'LockID': resource_name},
+            ConditionExpression=Attr('OwnerID').eq(owner_id)
+        )
+        return True
+    except table.meta.client.exceptions.ConditionalCheckFailedException:
+        return False</code></pre>
+
+   <p>This approach uses a condition expression to make sure that a lock can only be acquired if it
+    doesn't exist or has expired, and can only be released by the process that acquired it. Consider
+    enabling <a href="./TTL.html">Time to Live (TTL)</a> on the lock table to automatically clean
+    up expired lock items.</p>
+  <awsdocs-copyright class="copyright-print"></awsdocs-copyright><awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}"></awsdocs-thumb-feedback></div><noscript><div><div><div><div id="js_error_message"><p><img src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png" alt="Warning" /> <strong>Javascript is disabled or is unavailable in your browser.</strong></p><p>To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.</p></div></div></div></div></noscript><div id="main-col-footer" class="awsui-util-font-size-0"><div id="doc-conventions"><a target="_top" href="/general/latest/gr/docconventions.html">Document Conventions</a></div><div class="prev-next"><div id="previous" class="prev-link" accesskey="p" href="./BestPractices_PessimisticLocking.html">Pessimistic locking with
+    transactions</div><div id="next" class="next-link" accesskey="n" href="./bp-understanding-billing.html">Billing and Usage Reports</div></div></div><awsdocs-page-utilities></awsdocs-page-utilities></div><div id="quick-feedback-yes" style="display: none;"><div class="title">Did this page help you? - Yes</div><div class="content"><p>Thanks for letting us know we're doing a good job!</p><p>If you've got a moment, please tell us what we did right so we can do more of it.</p><p><awsui-button id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback" click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=DynamoDB&amp;topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html"></awsui-button></p></div></div><div id="quick-feedback-no" style="display: none;"><div class="title">Did this page help you? - No</div><div class="content"><p>Thanks for letting us know this page needs work. We're sorry we let you down.</p><p>If you've got a moment, please tell us how we can make the documentation better.</p><p><awsui-button id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback" click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=DynamoDB&amp;topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html"></awsui-button></p></div></div></div></body></div></awsdocs-view><div class="page-loading-indicator" id="page-loading-indicator"><awsui-spinner size="large"></awsui-spinner></div></div><div id="tools-panel" dom-region="tools"><awsdocs-tools-panel id="awsdocs-tools-panel"></awsdocs-tools-panel></div></awsui-app-layout><awsdocs-cookie-banner class="doc-cookie-banner"></awsdocs-cookie-banner></div></body></html>

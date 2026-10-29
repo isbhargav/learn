@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 2 — Renew only a lease you still own</title>
+  <link rel="stylesheet" href="../assets/course.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">DynamoDB distributed locking · Lesson 2</div>
+    <h1>Renew only a lease<br>you still own.</h1>
+    <p class="subtitle">Add a heartbeat that extends your lease without resurrecting an expired lock or overwriting a successor.</p>
+    <div class="meta"><span>6 minutes</span><span>Python + boto3</span><span>2 retrieval checks</span></div>
+  </header>
+
+  <section class="goal">
+    <strong>Your win</strong>
+    <p>You will be able to implement a guarded heartbeat and explain why a paused process can still become a stale lock holder.</p>
+  </section>
+
+  <h2>A heartbeat moves the deadline</h2>
+  <p>The <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html">AWS locking guide</a> uses a periodic heartbeat to extend the lease while the holder is active. Renewal must pass two checks in the same conditional update:</p>
+  <ul>
+    <li><code>OwnerID</code> still equals this acquisition’s token.</li>
+    <li><code>ExpiresAt</code> is still in the future.</li>
+  </ul>
+  <p>The second check prevents an expired lease from being resurrected. During the expired interval, another caller could acquire the lock.</p>
+
+  <pre><code>import time
+from boto3.dynamodb.conditions import Attr
+
+def heartbeat_lock(table, resource_name, owner_id, ttl_seconds):
+    now = int(time.time())
+    try:
+        table.update_item(
+            Key={"LockID": resource_name},
+            UpdateExpression="SET ExpiresAt = :expiry",
+            ConditionExpression=(
+                Attr("OwnerID").eq(owner_id)
+                &amp; Attr("ExpiresAt").gt(now)
+            ),
+            ExpressionAttributeValues={
+                ":expiry": now + ttl_seconds,
+            },
+        )
+        return True
+    except table.meta.client.exceptions.ConditionalCheckFailedException:
+        return False</code></pre>
+
+  <p>Run this periodically with a heartbeat period comfortably shorter than the lease duration. AWS’s example uses a <strong>3-second heartbeat</strong> and a <strong>10-second lease</strong>; those values are an illustration, not a guarantee for every workload.</p>
+
+  <div class="warning">
+    <p><strong>A false return is a stop signal.</strong> This token no longer holds a valid lease. Stop protected work rather than continuing until release.</p>
+  </div>
+
+  <h2>Why heartbeats cannot remove stale holders</h2>
+  <p>A heartbeat runs in your process. If that process freezes, its heartbeat freezes too—but the rest of the system keeps moving.</p>
+
+  <table>
+    <thead><tr><th>Time</th><th>Event</th><th>Lock state</th></tr></thead>
+    <tbody>
+      <tr><td>0s</td><td>A acquires a 10s lease</td><td>Owner A; expires at 10s</td></tr>
+      <tr><td>3s</td><td>A heartbeats successfully</td><td>Owner A; expires at 13s</td></tr>
+      <tr><td>4s</td><td>A freezes; heartbeats stop</td><td>No further extension</td></tr>
+      <tr><td>14s</td><td>B acquires the expired lock</td><td>Owner B; expires at 24s</td></tr>
+      <tr><td>15s</td><td>A resumes and heartbeats</td><td>Owner check fails</td></tr>
+    </tbody>
+  </table>
+
+  <p>The conditional heartbeat protects B’s lock item. It does <em>not</em> undo work A may already have performed after resuming. That remaining resource-safety problem is why fencing matters.</p>
+
+  <h2>Retrieve the failure modes</h2>
+  <section class="quiz" data-quiz
+    data-correct-feedback="Correct. OwnerID now belongs to B, and A’s original lease is no longer valid."
+    data-incorrect-feedback="Try again. Check both conditions against the lock item after B takes over.">
+    <h3>A’s lease expires, B acquires, then A heartbeats. What happens?</h3>
+    <div class="answers">
+      <button data-answer="incorrect">Renewal extends lease</button>
+      <button data-answer="correct">Renewal is rejected</button>
+      <button data-answer="incorrect">Renewal deletes lock</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <section class="quiz" data-quiz
+    data-correct-feedback="Correct. Continuing would let stale work overlap with the next lock holder."
+    data-incorrect-feedback="Try again. A failed heartbeat means this token no longer has a valid lease.">
+    <h3>Your heartbeat fails while protected work is running. What should you do?</h3>
+    <div class="answers">
+      <button data-answer="incorrect">Retry protected work</button>
+      <button data-answer="correct">Stop protected work</button>
+      <button data-answer="incorrect">Continue protected work</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <div class="note">
+    <p><strong>Small but important distinction:</strong> heartbeat failure tells your client to stop. Fencing lets the protected resource reject stale work even if a client fails to stop.</p>
+  </div>
+
+  <section class="source">
+    <p><strong>Primary source:</strong> Revisit “How it works” and the 10-second lease / 3-second heartbeat configuration in the <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html">AWS distributed locking guide</a>. The owner and expiry guards above apply the same <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html">conditional-update semantics</a> used in acquisition.</p>
+  </section>
+
+  <footer>
+    <p><a href="0001-acquire-and-release.html">← Lesson 1</a> · Keep the <a href="../reference/lease-renewal.html">lease renewal reference</a> nearby. Ask your teacher about any part of the pause-and-resume timeline that feels uncertain.</p>
+    <p><strong>Next:</strong> <a href="0003-fencing-tokens.html">Lesson 3: fencing tokens</a>—making the protected resource reject stale holders.</p>
+  </footer>
+</main>
+</body>
+</html>

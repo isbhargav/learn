@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DynamoDB lock protocol — quick reference</title>
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Quick reference</div>
+    <h1>DynamoDB lock protocol</h1>
+    <p class="subtitle">The lock item and its guarded transitions. A lease coordinates callers; it does not by itself fence a stale holder from an external resource.</p>
+  </header>
+
+  <h2>Lock item</h2>
+  <table>
+    <thead><tr><th>Attribute</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>LockID</code></td><td>Partition key identifying the protected resource.</td></tr>
+      <tr><td><code>OwnerID</code></td><td>Unique token for one acquisition, not merely a process name.</td></tr>
+      <tr><td><code>ExpiresAt</code></td><td>Numeric Unix epoch seconds after which another caller may acquire.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Core transitions</h2>
+  <div class="diagram" aria-label="Lock state transitions">
+    <div class="state">Absent or expired</div><div class="arrow">→</div>
+    <div class="state">Held by owner</div><div class="arrow">→</div>
+    <div class="state">Absent or expired</div>
+  </div>
+  <table>
+    <thead><tr><th>Operation</th><th>Required guard</th></tr></thead>
+    <tbody>
+      <tr><td>Acquire</td><td><code>attribute_not_exists(LockID) OR ExpiresAt &lt; :now</code></td></tr>
+      <tr><td>Renew</td><td><code>OwnerID = :owner</code>; extend only your own lease.</td></tr>
+      <tr><td>Release</td><td><code>OwnerID = :owner</code>; never release unconditionally. A fenced design expires the item and retains its counter.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <p><strong>Conditional failure is expected contention.</strong> Convert <code>ConditionalCheckFailedException</code> into “not acquired” or “not released”; handle other AWS errors separately.</p>
+  </div>
+  <div class="warning">
+    <p><strong>TTL is cleanup, not a lock clock.</strong> DynamoDB deletes expired TTL items eventually, typically within a few days. Acquisition must test <code>ExpiresAt</code> directly. If the item stores a fencing counter, preserve that item rather than deleting it through TTL. See the <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html">TTL documentation</a> and <a href="../lessons/0003-fencing-tokens.html">Lesson 3</a>.</p>
+  </div>
+  <div class="warning">
+    <p><strong>An expired holder can still be running.</strong> After another caller takes over, the old holder may touch the protected resource unless that resource rejects stale work. Production designs need a fencing strategy where the resource cannot otherwise make operations safe.</p>
+  </div>
+
+  <footer>
+    <p>Primary source: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html">AWS distributed locking guide</a>.</p>
+    <p><a href="../lessons/0001-acquire-and-release.html">Lesson 1: Acquire and release</a> · Ask your teacher about any transition you cannot explain.</p>
+  </footer>
+</main>
+</body>
+</html>

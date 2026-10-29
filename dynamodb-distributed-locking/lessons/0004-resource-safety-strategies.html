@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 4 — Choose where correctness lives</title>
+  <link rel="stylesheet" href="../assets/course.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">DynamoDB distributed locking · Lesson 4</div>
+    <h1>Choose where<br>correctness lives.</h1>
+    <p class="subtitle">Select fencing, compare-and-swap, transactions, serialization, idempotency, or a best-effort lock from the guarantees your resource can actually enforce.</p>
+    <div class="meta"><span>15 minutes</span><span>Design strategy</span><span>6 real-life examples</span><span>6 limitation walkthroughs</span><span>5 scenario checks</span></div>
+  </header>
+
+  <section class="goal">
+    <strong>Your win</strong>
+    <p>You will be able to choose a resource-safety strategy from a workload’s correctness needs and the resource’s atomic-operation capabilities.</p>
+  </section>
+
+  <h2>Start with the failure cost</h2>
+  <p>Ask what happens if two holders overlap. If the result is only duplicated cost, a best-effort lock may be enough. If the result is corrupted state or an invalid side effect, something must <strong>enforce correctness where the operation is applied</strong>.</p>
+  <p>Then ask which atomic precondition that component supports. The answer—not the lock library—determines the viable strategy.</p>
+
+  <h2>The strategy map</h2>
+  <table>
+    <thead><tr><th>Strategy</th><th>Use it when</th><th>Main limitation</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Native fencing</strong></td>
+        <td>The resource can reject an older token at the same time it applies a write.</td>
+        <td>A repeated request with the same token may still run more than once.</td>
+      </tr>
+      <tr>
+        <td><strong>Compare-and-swap</strong></td>
+        <td>The resource can accept a write only if its version is unchanged, as with S3 <code>If-Match</code>.</td>
+        <td>It protects only writes that check the version; it does not order unrelated actions.</td>
+      </tr>
+      <tr>
+        <td><strong>Atomic transaction</strong></td>
+        <td>The safety check and all protected database changes must succeed or fail together.</td>
+        <td>External API calls and other outside effects are not part of the database transaction.</td>
+      </tr>
+      <tr>
+        <td><strong>Single-writer gateway</strong></td>
+        <td>Every operation can go through one service that sends them to the resource in order.</td>
+        <td>Every caller must use the gateway, and only one gateway may be active at a time.</td>
+      </tr>
+      <tr>
+        <td><strong>Idempotent operations</strong></td>
+        <td>Retries of the same operation can reuse one key, allowing the system to return the original result.</td>
+        <td>It makes retries safe, but it does not stop an older, different write from damaging newer state.</td>
+      </tr>
+      <tr>
+        <td><strong>Best-effort lock</strong></td>
+        <td>Running the work twice only wastes time or money; it cannot damage data or cause invalid effects.</td>
+        <td>It reduces duplicate work but does not keep data correct when overlapping work is unsafe.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Match the mechanism to the resource</h2>
+  <h3>S3: expected-version writes</h3>
+  <p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes.html">S3 conditional writes</a> support <code>If-Match</code>. Read the object and its ETag, compute the new value, then write only if that ETag is still current. A competing write changes the ETag and causes the stale write to fail. This fits read-modify-write workflows; a failed writer must re-read before retrying.</p>
+
+  <h3>DynamoDB: conditional update or transaction</h3>
+  <p>For one item, a conditional update can check the token/version and modify the data together. For several items, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html">DynamoDB transactions</a> provide all-or-nothing writes. Use a transaction only when the protected changes truly need one atomic commit.</p>
+
+  <h3>External API: serialize or redesign</h3>
+  <p>If an API offers neither token checks nor version preconditions, route its operations through a single-writer gateway. That gateway becomes part of your correctness boundary: every caller must use it, and its failover must not create two active writers. If you cannot guarantee that, redesign the resource protocol rather than claiming the lock alone is safe.</p>
+
+  <div class="note">
+    <p><strong>Idempotency is often complementary.</strong> Use it for retries inside a fencing, CAS, transaction, or gateway design. It solves repeated execution of one logical operation—not ordering between different acquisitions.</p>
+  </div>
+
+  <h2>Real-life examples</h2>
+  <table>
+    <thead><tr><th>Strategy</th><th>Example</th><th>Why it fits</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Native fencing</strong></td>
+        <td>Several application workers can update the same inventory record. Worker A pauses, worker B takes over with a newer token, then A resumes and tries to write.</td>
+        <td>The inventory store rejects A’s older token while applying the update, so A cannot overwrite B’s newer state.</td>
+      </tr>
+      <tr>
+        <td><strong>Compare-and-swap</strong></td>
+        <td>Two administrators edit the same JSON configuration in S3. Each reads the file, makes changes, and writes with the ETag they originally read.</td>
+        <td>The first write changes the ETag. The second write fails its <code>If-Match</code> check instead of silently erasing the first administrator’s changes.</td>
+      </tr>
+      <tr>
+        <td><strong>Atomic transaction</strong></td>
+        <td>An order service must create an order, decrease inventory, and validate the current operation token in DynamoDB.</td>
+        <td>All three changes succeed together. If inventory is insufficient or the token is stale, none of them is applied.</td>
+      </tr>
+      <tr>
+        <td><strong>Single-writer gateway</strong></td>
+        <td>A legacy customer-management API has no ETags or token checks. Several internal systems need to update the same customer profile.</td>
+        <td>All systems send updates to one integration service, which processes each customer’s updates in order instead of calling the legacy API directly.</td>
+      </tr>
+      <tr>
+        <td><strong>Idempotent operations</strong></td>
+        <td>A checkout service sends a “create charge” request, but a network timeout hides the result. It retries with the same purchase ID as the idempotency key.</td>
+        <td>The payment system recognizes the repeated purchase ID and returns the original result rather than creating a second charge.</td>
+      </tr>
+      <tr>
+        <td><strong>Best-effort lock</strong></td>
+        <td>Several servers can generate the same nightly analytics report or warm the same cache, but the output is identical each time.</td>
+        <td>A lock avoids most duplicated cost. Rare overlap wastes compute but produces the same correct result.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Understand each limitation</h2>
+
+  <h3>Native fencing: repeated work can still repeat</h3>
+  <p>Fencing compares <strong>different lock acquisitions</strong>. It does not automatically recognize two requests from the same acquisition as duplicates.</p>
+  <p><strong>Example:</strong> Worker A holds token 34 and sends a write. A timeout hides the result, so A retries with token 34. Both requests may be accepted because neither token is older. If repeating the write is unsafe, add an idempotency key.</p>
+
+  <h3>Compare-and-swap: only checked writes are protected</h3>
+  <p>The resource checks the version only when the writer supplies a precondition such as <code>If-Match</code>. A writer that omits the check can still overwrite the resource. The check also says nothing about the order of unrelated actions.</p>
+  <p><strong>Example:</strong> Two careful editors use <code>If-Match</code> on an S3 configuration, but a third script uses an ordinary unconditional upload. That script can overwrite both editors’ work. Similarly, a successful configuration write does not determine when a separate notification API call occurs.</p>
+
+  <h3>Atomic transaction: outside effects stay outside</h3>
+  <p>A database transaction covers only the database operations included in it. It cannot roll back an email, payment, or third-party API call.</p>
+  <p><strong>Example:</strong> Your transaction creates an order and decreases inventory, but the following shipping API call fails. The database commit is not undone. Conversely, if the API call succeeds and the transaction fails, the external effect remains. You need a workflow, retry, and reconciliation design for those outside effects.</p>
+
+  <h3>Single-writer gateway: nobody can bypass it</h3>
+  <p>The gateway preserves order only when every operation goes through it. Its failover must also ensure that two gateways do not become active writers at the same time.</p>
+  <p><strong>Example:</strong> Internal systems send customer updates through an integration service, but one script still calls the legacy API directly. That direct call can overtake the gateway’s updates. During failover, an old gateway and its replacement must not both continue sending writes.</p>
+
+  <h3>Idempotent operations: only the same operation is deduplicated</h3>
+  <p>Idempotency recognizes retries that reuse the same key. It does not prove that an operation is current, and a different key is treated as a new operation.</p>
+  <p><strong>Example:</strong> Retrying “create charge for purchase 123” with key <code>purchase-123</code> is safe. However, an old profile update arriving with a new request ID can still overwrite a newer profile. That second problem needs versioning, fencing, or ordering.</p>
+
+  <h3>Best-effort lock: overlap is reduced, not prevented</h3>
+  <p>A best-effort lock can make duplicate work uncommon, but expiry, pauses, or failures can still allow two workers to run together.</p>
+  <p><strong>Example:</strong> Two workers generating the same report only waste compute. Two workers issuing the same refund could create a serious financial error. The first workload can use a best-effort lock; the second needs a correctness mechanism such as idempotency and transactional state checks.</p>
+
+  <h2>Apply the strategy map</h2>
+  <section class="quiz" data-quiz
+    data-correct-feedback="Correct. Overlap only wastes compute, so the lock is an efficiency optimization."
+    data-incorrect-feedback="Try again. The scenario explicitly says duplicate execution is harmless.">
+    <h3>A nightly report is expensive, but generating it twice is harmless. Which strategy fits?</h3>
+    <div class="answers">
+      <button data-answer="correct">Best-effort locking</button>
+      <button data-answer="incorrect">Fencing token checks</button>
+      <button data-answer="incorrect">Multi-item transactions</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <section class="quiz" data-quiz
+    data-correct-feedback="Correct. If-Match makes S3 reject a write when another writer has changed the object version."
+    data-incorrect-feedback="Try again. You need S3 to enforce a precondition when it applies the write.">
+    <h3>Clients update an S3 object read-modify-write and must prevent lost updates. Which strategy fits?</h3>
+    <div class="answers">
+      <button data-answer="correct">Compare-and-swap writes</button>
+      <button data-answer="incorrect">Longer lease durations</button>
+      <button data-answer="incorrect">Random owner identifiers</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <section class="quiz" data-quiz
+    data-correct-feedback="Correct. The token check and both item changes must succeed or fail together."
+    data-incorrect-feedback="Try again. Two item changes and their safety check need one all-or-nothing commit.">
+    <h3>A workflow must update two DynamoDB items and validate its fencing state together. Which strategy fits?</h3>
+    <div class="answers">
+      <button data-answer="correct">Atomic transaction</button>
+      <button data-answer="incorrect">Client-side validation</button>
+      <button data-answer="incorrect">Extended heartbeat interval</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <section class="quiz" data-quiz
+    data-correct-feedback="Correct. The gateway can serialize operations before they reach the API, provided nobody can bypass it."
+    data-incorrect-feedback="Try again. The API cannot reject stale writes, so another component must sequence every operation.">
+    <h3>An external API has no preconditions, and all calls can pass through one service. Which strategy fits?</h3>
+    <div class="answers">
+      <button data-answer="correct">Single-writer gateway</button>
+      <button data-answer="incorrect">Unconditional direct writes</button>
+      <button data-answer="incorrect">Client-side token checks</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <section class="quiz" data-quiz
+    data-correct-feedback="Correct. A stable deduplication key lets the system recognize retries of the same logical charge."
+    data-incorrect-feedback="Try again. The problem is repeated execution of the same logical request.">
+    <h3>A payment request may be retried after a timeout and must not charge twice. Which strategy fits?</h3>
+    <div class="answers">
+      <button data-answer="correct">Idempotency keys</button>
+      <button data-answer="incorrect">Longer lease durations</button>
+      <button data-answer="incorrect">Unconditional repeated charges</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <div class="warning">
+    <p><strong>No viable enforcement point means no correctness guarantee.</strong> Longer leases, extra heartbeats, lock-delay, or another lock store can reduce risk, but they cannot replace an atomic resource-side precondition or a correctly serialized write path.</p>
+  </div>
+
+  <section class="source">
+    <p><strong>Primary sources:</strong> Use <a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html">Kleppmann’s efficiency-versus-correctness framing</a>, then consult the <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes.html">S3 conditional-write</a> and <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html">DynamoDB transaction</a> documentation for concrete resource capabilities.</p>
+  </section>
+
+  <footer>
+    <p><a href="0003-fencing-tokens.html">← Lesson 3</a> · Use the <a href="../reference/fencing-tokens.html">strategy and fencing reference</a> for design reviews. Ask your teacher to evaluate a real resource you have in mind.</p>
+    <p><strong>Next:</strong> assemble the complete lock and failure-test contention, pauses, and stale writes.</p>
+  </footer>
+</main>
+</body>
+</html>

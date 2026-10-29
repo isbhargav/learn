@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 1 — Acquire without stealing, release without deleting</title>
+  <link rel="stylesheet" href="../assets/course.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">DynamoDB distributed locking · Lesson 1</div>
+    <h1>Acquire without stealing.<br>Release without deleting.</h1>
+    <p class="subtitle">Build the core Python lock transitions: one caller wins acquisition, and only the current owner can release the item.</p>
+    <div class="meta"><span>6 minutes</span><span>Python + boto3</span><span>2 retrieval checks</span></div>
+  </header>
+
+  <section class="goal">
+    <strong>Your win</strong>
+    <p>You will be able to implement the acquisition and release core, including the ownership guard that prevents a stale holder from deleting a successor’s lock.</p>
+  </section>
+
+  <h2>One item represents one lock</h2>
+  <p>Use <code>LockID</code> as the partition key. Store an <code>OwnerID</code> unique to this acquisition and an <code>ExpiresAt</code> lease deadline in Unix epoch seconds.</p>
+  <p>The <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html">AWS locking guide</a> makes acquisition a single conditional update: the item must be absent <em>or</em> expired. DynamoDB evaluates that condition against the item being written, so competing callers cannot both pass it.</p>
+
+  <pre><code>import time
+import uuid
+from boto3.dynamodb.conditions import Attr
+
+def acquire_lock(table, resource_name, ttl_seconds):
+    owner_id = str(uuid.uuid4())
+    now = int(time.time())
+    try:
+        table.update_item(
+            Key={"LockID": resource_name},
+            UpdateExpression=(
+                "SET OwnerID = :owner, ExpiresAt = :expiry"
+            ),
+            ConditionExpression=(
+                Attr("LockID").not_exists()
+                | Attr("ExpiresAt").lt(now)
+            ),
+            ExpressionAttributeValues={
+                ":owner": owner_id,
+                ":expiry": now + ttl_seconds,
+            },
+        )
+        return owner_id
+    except table.meta.client.exceptions.ConditionalCheckFailedException:
+        return None</code></pre>
+
+  <p>A returned token means “I acquired this lease.” <code>None</code> means “someone else currently holds it.” Other exceptions should propagate rather than being mistaken for contention.</p>
+
+  <h2>Release is a guarded delete</h2>
+  <p>An unconditional <code>DeleteItem</code> is unsafe. Your lease may expire, another caller may acquire, and then your old request could delete the new caller’s lock. The owner check turns release into a compare-and-delete operation.</p>
+
+  <pre><code>def release_lock(table, resource_name, owner_id):
+    try:
+        table.delete_item(
+            Key={"LockID": resource_name},
+            ConditionExpression=Attr("OwnerID").eq(owner_id),
+        )
+        return True
+    except table.meta.client.exceptions.ConditionalCheckFailedException:
+        return False</code></pre>
+
+  <div class="note">
+    <p>Call release in <code>finally</code> only when acquisition succeeded. A failed release after lease expiry is expected: it means this token no longer owns the item.</p>
+  </div>
+
+  <h2>Retrieve the invariant</h2>
+  <section class="quiz" data-quiz
+    data-correct-feedback="Correct. DynamoDB accepts one conditional transition; the other caller sees a conditional failure."
+    data-incorrect-feedback="Try again. Both callers target the same item, and the condition allows a write only while it is absent or expired.">
+    <h3>Two callers concurrently acquire the same absent lock. What happens?</h3>
+    <div class="answers">
+      <button data-answer="incorrect">Both writes succeed</button>
+      <button data-answer="correct">Exactly one succeeds</button>
+      <button data-answer="incorrect">Both writes fail</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <section class="quiz" data-quiz
+    data-correct-feedback="Correct. OwnerID now belongs to B, so A’s compare-and-delete condition fails."
+    data-incorrect-feedback="Try again. Focus on the OwnerID currently stored after B takes over.">
+    <h3>A’s lease expires, B acquires, then A tries to release. What happens?</h3>
+    <div class="answers">
+      <button data-answer="incorrect">A deletes lock</button>
+      <button data-answer="correct">A cannot delete</button>
+      <button data-answer="incorrect">A extends lock</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <div class="warning">
+    <p><strong>This is the core, not a complete production lock.</strong> It has no heartbeat yet. Also, owner-checked release protects the lock item, not the external resource: a paused holder can resume after expiry. Lease renewal and fencing are separate lessons.</p>
+  </div>
+
+  <section class="source">
+    <p><strong>Primary source:</strong> Read the “How it works,” “Tradeoffs,” and Python portions of the <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_DistributedLocking.html">AWS distributed locking guide</a>. Our numeric expiry matches DynamoDB’s <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html">TTL format</a>; TTL may clean up old items, but acquisition must still check expiry itself.</p>
+  </section>
+
+  <footer>
+    <p>Keep the <a href="../reference/lock-protocol.html">lock protocol quick reference</a> nearby. If any condition or timeline is unclear, ask your teacher before moving on.</p>
+    <p><strong>Next:</strong> <a href="0002-lease-renewal.html">Lesson 2: lease renewal</a>—why heartbeats reduce, but do not eliminate, stale-holder risk.</p>
+  </footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Using update expressions in DynamoDB - Amazon DynamoDB</title><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="assets_root" content="/assets" /><meta name="target_state" content="Expressions.UpdateExpressions" /><meta name="default_state" content="Expressions.UpdateExpressions" /><link rel="icon" type="image/ico" href="/assets/images/favicon.ico" /><link rel="shortcut icon" type="image/ico" href="/assets/images/favicon.ico" /><link rel="canonical" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" /><link rel="alternate" type="text/markdown" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.md" title="Markdown version" /><meta name="description" content="To update a DynamoDB item's attributes, use an action of an update expression in an API call. Learn how and when to use an update expression in DynamoDB with the AWS Command Line Interface and AWS SDKs." /><meta name="deployment_region" content="IAD" /><meta name="product" content="Amazon DynamoDB" /><meta name="guide" content="Developer Guide" /><meta name="abstract" content="Amazon DynamoDB is a fast, fully managed NoSQL database as a service that makes it simple and cost-effective to store and retrieve any amount of data, and serve any level of request traffic." /><meta name="guide-locale" content="en_us" /><meta name="tocs" content="toc-contents.json" /><link rel="canonical" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" /><link rel="alternate" href="https://docs.aws.amazon.com/id_id/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="id-id" /><link rel="alternate" href="https://docs.aws.amazon.com/id_id/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="id" /><link rel="alternate" href="https://docs.aws.amazon.com/de_de/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="de-de" /><link rel="alternate" href="https://docs.aws.amazon.com/de_de/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="de" /><link rel="alternate" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="en-us" /><link rel="alternate" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="en" /><link rel="alternate" href="https://docs.aws.amazon.com/es_es/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="es-es" /><link rel="alternate" href="https://docs.aws.amazon.com/es_es/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="es" /><link rel="alternate" href="https://docs.aws.amazon.com/fr_fr/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="fr-fr" /><link rel="alternate" href="https://docs.aws.amazon.com/fr_fr/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="fr" /><link rel="alternate" href="https://docs.aws.amazon.com/it_it/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="it-it" /><link rel="alternate" href="https://docs.aws.amazon.com/it_it/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="it" /><link rel="alternate" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="ja-jp" /><link rel="alternate" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="ja" /><link rel="alternate" href="https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="ko-kr" /><link rel="alternate" href="https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="ko" /><link rel="alternate" href="https://docs.aws.amazon.com/pt_br/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="pt-br" /><link rel="alternate" href="https://docs.aws.amazon.com/pt_br/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="pt" /><link rel="alternate" href="https://docs.aws.amazon.com/zh_cn/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="zh-cn" /><link rel="alternate" href="https://docs.aws.amazon.com/zh_tw/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="zh-tw" /><link rel="alternate" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" hreflang="x-default" /><meta name="feedback-item" content="DynamoDB" /><meta name="this_doc_product" content="Amazon DynamoDB" /><meta name="this_doc_guide" content="Developer Guide" /><head xmlns="http://www.w3.org/1999/xhtml"> <script defer="" src="/assets/r/awsdocs-doc-page.2.0.0.js"></script><link href="/assets/r/awsdocs-doc-page.2.0.0.css" rel="stylesheet"/></head>
+<script defer="" id="awsc-panorama-bundle" type="text/javascript" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'dynamodb'}"></script><meta id="panorama-serviceSubSection" value="Developer Guide" /><meta id="panorama-serviceConsolePage" value="Using update expressions in DynamoDB" /></head><body class="awsdocs awsui"><div class="awsdocs-container"><p><a href="Expressions.UpdateExpressions.md">View a markdown version of this page</a></p><awsdocs-header></awsdocs-header><awsui-app-layout id="app-layout" class="awsui-util-no-gutters" ng-controller="ContentController as $ctrl" header-selector="awsdocs-header" navigation-hide="false" navigation-width="$ctrl.navWidth" navigation-open="$ctrl.navOpen" navigation-change="$ctrl.onNavChange($event)" tools-hide="$ctrl.hideTools" tools-width="$ctrl.toolsWidth" tools-open="$ctrl.toolsOpen" tools-change="$ctrl.onToolsChange($event)"><div id="guide-toc" dom-region="navigation"><awsdocs-toc></awsdocs-toc></div><div id="main-column" dom-region="content" tabindex="-1"><awsdocs-view class="awsdocs-view"><div id="awsdocs-content"><head><title>Using update expressions in DynamoDB - Amazon DynamoDB</title><meta name="pdf" content="/pdfs/amazondynamodb/latest/developerguide/dynamodb-dg.pdf#Expressions.UpdateExpressions" /><meta name="rss" content="dynamodbupdates.rss" /><meta name="forums" content="https://repost.aws/tags/TAljkKQ0MDQJCjDdxSeDQBJw" /><meta name="feedback" content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=DynamoDB&amp;topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" /><meta name="feedback-yes" content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" /><meta name="feedback-no" content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html" /><meta name="keywords" content="DynamoDB,Amazon DynamoDB,database,NoSQL database,nonrelational database,managed database,DynamoDB tables,DynamoDB table operations,DynamoDB table management,DynamoDB table items,DynamoDB indexes,DynamoDB global tables,DynamoDB transactions,DynamoDB Streams" /><script type="application/ld+json">
+{
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Amazon DynamoDB",
+        "item" : "https://docs.aws.amazon.com/dynamodb/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Developer Guide",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Working with tables, items, queries, scans, and indexes",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithDynamo.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Working with items and attributes in DynamoDB",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Using expressions in DynamoDB",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 7,
+        "name" : "Using update expressions in DynamoDB",
+        "item" : "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.html"
+      }
+    ]
+}
+</script></head><body><div id="main"><div style="display: none"><a href="/pdfs/amazondynamodb/latest/developerguide/dynamodb-dg.pdf#Expressions.UpdateExpressions" target="_blank" rel="noopener noreferrer" title="Open PDF"></a></div><div id="breadcrumbs" class="breadcrumb"><a href="/index.html">Documentation</a><a href="/dynamodb/index.html">Amazon DynamoDB</a><a href="Introduction.html">Developer Guide</a></div><div id="page-toc-src"><a href="#Expressions.UpdateExpressions.SET">SET — modifying or adding item attributes</a><a href="#Expressions.UpdateExpressions.REMOVE">REMOVE — deleting attributes from an item</a><a href="#Expressions.UpdateExpressions.ADD">ADD — updating numbers and sets</a><a href="#Expressions.UpdateExpressions.DELETE">DELETE — removing elements from a set</a><a href="#Expressions.UpdateExpressions.Multiple">Using multiple update expressions</a></div><div id="main-content" class="awsui-util-container"><div id="main-col-body"><awsdocs-language-banner data-service="$ctrl.pageService"></awsdocs-language-banner><h1 class="topictitle" id="Expressions.UpdateExpressions">Using update expressions in DynamoDB</h1><div class="awsdocs-page-header-container"><awsdocs-page-header></awsdocs-page-header><awsdocs-filter-selector id="awsdocs-filter-selector"></awsdocs-filter-selector></div><p>The <code class="code">UpdateItem</code> operation updates an existing item, or adds a new item to the
+		table if it does not already exist. You must provide the key of the item that you want to
+		update. You must also provide an update expression, indicating the attributes that you want
+		to modify and the values that you want to assign to them. </p><p>An <em>update expression</em> specifies how <code class="code">UpdateItem</code> will
+		modify the attributes of an item—for example, setting a scalar value or removing
+		elements from a list or a map.</p><p>The following is a syntax summary for update expressions.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight"><b>update-expression</b> ::=
+    [ SET <code class="replaceable">action</code> [, <code class="replaceable">action</code>] ... ]
+    [ REMOVE <code class="replaceable">action</code> [, <code class="replaceable">action</code>] ...]
+    [ ADD <code class="replaceable">action</code> [, <code class="replaceable">action</code>] ... ]
+    [ DELETE <code class="replaceable">action</code> [, <code class="replaceable">action</code>] ...]</code></pre><p>An update expression consists of one or more clauses. Each clause begins with a
+			<code class="code">SET</code>, <code class="code">REMOVE</code>, <code class="code">ADD</code>, or <code class="code">DELETE</code> keyword.
+		You can include any of these clauses in an update expression, in any order. However, each
+		action keyword can appear only once.</p><p>Within each clause, there are one or more actions separated by commas. Each action
+		represents a data modification.</p><div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>When an update expression contains multiple actions, DynamoDB evaluates every action
+			against the item's attribute values <em>as they were before the update</em>.
+			The actions aren't applied one after another from left to right, so an action's
+			right-hand operand always refers to the pre-update value of an attribute—even if
+			another action in the same expression also modifies that attribute.</p><p>For example, suppose an item is <code class="code"><span>{</span>"id": "1", "a": 1, "b": 2, "c": 3}</code> and
+			you run the following update expression:</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">REMOVE a SET b = a, c = b</code></pre><p>The result is <code class="code"><span>{</span>"id": "1", "b": 1, "c": 2}</code>. Both <code class="code">b = a</code> and
+			<code class="code">c = b</code> use the original values of <code class="code">a</code> and <code class="code">b</code>
+			(<code class="code">1</code> and <code class="code">2</code>), and <code class="code">a</code> is removed.</p></div></div><p>The examples in this section are based on the <code class="code">ProductCatalog</code> item shown in
+			<a href="./Expressions.ProjectionExpressions.html">Using projection expressions in DynamoDB</a>.</p><p>The topics below cover some different use cases for the <code class="code">SET</code> action.</p><div class="highlights" id="inline-topiclist"><h6>Topics</h6><ul><li><p><a href="#Expressions.UpdateExpressions.SET">SET — modifying or adding item attributes</a></p></li><li><p><a href="#Expressions.UpdateExpressions.REMOVE">REMOVE — deleting attributes from an item</a></p></li><li><p><a href="#Expressions.UpdateExpressions.ADD">ADD — updating numbers and sets</a></p></li><li><p><a href="#Expressions.UpdateExpressions.DELETE">DELETE — removing elements from a set</a></p></li><li><p><a href="#Expressions.UpdateExpressions.Multiple">Using multiple update expressions</a></p></li></ul></div>
+		<h2 id="Expressions.UpdateExpressions.SET">SET — modifying or adding item attributes</h2>
+
+		<p>Use the <code class="code">SET</code> action in an update expression to add one or more attributes
+			to an item. If any of these attributes already exists, they are overwritten by the new
+			values. If you want to avoid overwriting an existing attribute, you can use
+			<code class="code">SET</code> with the <code class="code">if_not_exists</code> function. The
+				<code class="code">if_not_exists</code> function is specific to the <code class="code">SET</code> action and
+			can only be used in an update expression.</p>
+		<p>When you use <code class="code">SET</code> to update a list element, the contents of that element
+			are replaced with the new data that you specify. If the element doesn't already exist,
+				<code class="code">SET</code> appends the new element at the end of the list.</p>
+		<p>If you add multiple elements in a single <code class="code">SET</code> operation, the elements are
+			sorted in order by element number.</p>
+
+		<p>You can also use <code class="code">SET</code> to add or subtract from an attribute that is of type
+				<code class="code">Number</code>. To perform multiple <code class="code">SET</code> actions, separate them
+			with commas.</p>
+		<p>In the following syntax summary:</p>
+		<div class="itemizedlist">
+			 
+			 
+		<ul class="itemizedlist"><li class="listitem">
+				<p>The <code class="replaceable">path</code> element is the document path to the
+					item.</p>
+			</li><li class="listitem">
+				<p>An <em><code class="replaceable">operand</code></em> element can be
+					either a document path to an item or a function.</p>
+			</li></ul></div>
+		<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight"><b>set-action</b> ::=
+    <code class="replaceable">path</code> = value
+
+<b>value</b> ::=
+    <code class="replaceable">operand</code>
+    | <code class="replaceable">operand</code> '+' <code class="replaceable">operand</code>
+    | <code class="replaceable">operand</code> '-' <code class="replaceable">operand</code>
+
+<b>operand</b> ::=
+    <code class="replaceable">path</code> | function
+
+<b>function</b> ::=
+    <code class="replaceable">if_not_exists (path, value)</code></code></pre>
+
+		<p>If the item does not contain an attribute at the specified path,
+				<code class="code">if_not_exists</code> evaluates to <code class="code">value</code>. Otherwise, it evaluates
+			to <code class="code">path</code>.</p>
+		<p>The following <code class="code">PutItem</code> operation creates a sample item that the examples
+			refer to.</p>
+		<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb put-item \
+    --table-name ProductCatalog \
+    --item file://item.json</code></pre>
+		<p>The arguments for <code class="code">--item</code> are stored in the <code>item.json</code>
+			file. (For simplicity, only a few item attributes are used.)</p>
+		<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    "Id": <span>{</span>"N": "789"},
+    "ProductCategory": <span>{</span>"S": "Home Improvement"},
+    "Price": <span>{</span>"N": "52"},
+    "InStock": <span>{</span>"BOOL": true},
+    "Brand": <span>{</span>"S": "Acme"}
+}</code></pre>
+		<div class="highlights" id="inline-topiclist"><h6>Topics</h6><ul><li><p><a href="#Expressions.UpdateExpressions.SET.ModifyingAttributes">Modifying attributes</a></p></li><li><p><a href="#Expressions.UpdateExpressions.SET.AddingListsAndMaps">Adding lists and maps</a></p></li><li><p><a href="#Expressions.UpdateExpressions.SET.AddingListElements">Adding elements to a list</a></p></li><li><p><a href="#Expressions.UpdateExpressions.SET.AddingNestedMapAttributes">Adding nested map attributes</a></p></li><li><p><a href="#Expressions.UpdateExpressions.SET.IncrementAndDecrement">Incrementing and decrementing numeric attributes</a></p></li><li><p><a href="#Expressions.UpdateExpressions.SET.UpdatingListElements">Appending elements to a list</a></p></li><li><p><a href="#Expressions.UpdateExpressions.SET.PreventingAttributeOverwrites">Preventing overwrites of an existing attribute</a></p></li></ul></div>
+		 
+			<h3 id="Expressions.UpdateExpressions.SET.ModifyingAttributes">Modifying attributes</h3>
+
+			<div class="example"><h6>Example</h6><div class="example-contents"><p>Update the <code class="code">ProductCategory</code> and <code class="code">Price</code>
+					attributes.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "SET ProductCategory = :c, Price = :p" \
+    --expression-attribute-values file://values.json \
+    --return-values ALL_NEW</code></pre><p>The arguments for <code class="code">--expression-attribute-values</code> are stored in the
+						<code>values.json</code> file.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    ":c": <span>{</span> "S": "Hardware" },
+    ":p": <span>{</span> "N": "60" }
+}</code></pre></div></div>
+			<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>In the <code class="code">UpdateItem</code> operation, <code class="code">--return-values ALL_NEW</code>
+					causes DynamoDB to return the item as it appears after the update.</p></div></div>
+		 
+
+		 
+			<h3 id="Expressions.UpdateExpressions.SET.AddingListsAndMaps">Adding lists and maps</h3>
+
+			<div class="example"><h6>Example</h6><div class="example-contents"><p>Add a new list and a new map.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "SET RelatedItems = :ri, ProductReviews = :pr" \
+    --expression-attribute-values file://values.json \
+    --return-values ALL_NEW</code></pre><p>The arguments for <code class="code">--expression-attribute-values</code> are stored in the
+						<code>values.json</code> file.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    ":ri": <span>{</span>
+        "L": [
+            <span>{</span> "S": "Hammer" }
+        ]
+    },
+    ":pr": <span>{</span>
+        "M": <span>{</span>
+            "FiveStar": <span>{</span>
+                "L": [
+                    <span>{</span> "S": "Best product ever!" }
+                ]
+            }
+        }
+    }
+}</code></pre></div></div>
+		 
+		 
+			<h3 id="Expressions.UpdateExpressions.SET.AddingListElements">Adding elements to a list</h3>
+
+			<div class="example"><h6>Example</h6><div class="example-contents"><p>Add a new attribute to the <code class="code">RelatedItems</code> list. (Remember that list
+					elements are zero-based, so [0] represents the first element in the list, [1]
+					represents the second, and so on.)</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "SET RelatedItems[1] = :ri" \
+    --expression-attribute-values file://values.json \
+    --return-values ALL_NEW</code></pre><p>The arguments for <code class="code">--expression-attribute-values</code> are stored in the
+						<code>values.json</code> file.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    ":ri": <span>{</span> "S": "Nails" }
+}</code></pre></div></div>
+			<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>When you use <code class="code">SET</code> to update a list element, the contents of that
+					element are replaced with the new data that you specify. If the element doesn't
+					already exist, <code class="code">SET</code> appends the new element at the end of the
+					list.</p><p>If you add multiple elements in a single <code class="code">SET</code> operation, the
+					elements are sorted in order by element number.</p></div></div>
+
+		 
+		 
+			<h3 id="Expressions.UpdateExpressions.SET.AddingNestedMapAttributes">Adding nested map attributes</h3>
+
+			<div class="example"><h6>Example</h6><div class="example-contents"><p>Add some nested map attributes.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "SET #pr.#5star[1] = :r5, #pr.#3star = :r3" \
+    --expression-attribute-names file://names.json \
+    --expression-attribute-values file://values.json \
+    --return-values ALL_NEW</code></pre><p>The arguments for <code class="code">--expression-attribute-names</code> are stored in the
+						<code>names.json</code> file.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    "#pr": "ProductReviews",
+    "#5star": "FiveStar",
+    "#3star": "ThreeStar"
+}</code></pre><p>The arguments for <code class="code">--expression-attribute-values</code> are stored in the
+						<code>values.json</code> file.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    ":r5": <span>{</span> "S": "Very happy with my purchase" },
+    ":r3": <span>{</span>
+        "L": [
+            <span>{</span> "S": "Just OK - not that great" }
+        ]
+    }
+}</code></pre></div></div>
+			<div class="awsdocs-note awsdocs-important"><div class="awsdocs-note-title"><awsui-icon name="status-warning" variant="error"></awsui-icon><h6>Important</h6></div><div class="awsdocs-note-text"><p>You cannot update nested map attributes if the parent map does not exist. If you attempt to update a nested attribute (for example, <code class="code">ProductReviews.FiveStar</code>) when the parent map (<code class="code">ProductReviews</code>) does not exist, DynamoDB returns a <code class="code">ValidationException</code> with the message <em>"The document path provided in the update expression is invalid for update."</em></p><p>When creating items that will have nested map attributes updated later, initialize empty maps for the parent attributes. For example:</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    "Id": <span>{</span>"N": "789"},
+    "ProductReviews": <span>{</span>"M": <span>{</span>}},
+    "Metadata": <span>{</span>"M": <span>{</span>}}
+}</code></pre><p>This allows you to update nested attributes like <code class="code">ProductReviews.FiveStar</code> without errors.</p></div></div>
+		 
+		 
+			<h3 id="Expressions.UpdateExpressions.SET.IncrementAndDecrement">Incrementing and decrementing numeric attributes</h3>
+
+			<p>You can add to or subtract from an existing numeric attribute. To do this, use the
+					<code class="code">+</code> (plus) and <code class="code">-</code> (minus) operators.</p>
+			<div class="example"><h6>Example</h6><div class="example-contents"><p>Decrease the <code class="code">Price</code> of an item.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "SET Price = Price - :p" \
+    --expression-attribute-values '<span>{</span>":p": <span>{</span>"N":"15"}}' \
+    --return-values ALL_NEW</code></pre><p>To increase the <code class="code">Price</code>, you would use the <code class="code">+</code> operator
+					in the update expression.</p></div></div>
+		 
+
+		 
+			<h3 id="Expressions.UpdateExpressions.SET.UpdatingListElements">Appending elements to a list</h3>
+
+			<p>You can add elements to the end of a list. To do this, use <code class="code">SET</code> with
+				the <code class="code">list_append</code> function. (The function name is case sensitive.) The
+					<code class="code">list_append</code> function is specific to the <code class="code">SET</code> action and
+				can only be used in an update expression. The syntax is as follows.</p>
+
+			<div class="itemizedlist">
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><code class="code">list_append (<code class="replaceable">list1</code>,
+								<code class="replaceable">list2</code>)</code></p>
+				</li></ul></div>
+
+			<p>The function takes two lists as input and appends all elements from
+						<code class="code"><code class="replaceable">list2</code></code> to <code class="code">
+					<code class="replaceable">list1</code></code>.</p>
+			<div class="example"><h6>Example</h6><div class="example-contents"><p>In <a href="#Expressions.UpdateExpressions.SET.AddingListElements">Adding elements to a list</a>, you
+					create the <code class="code">RelatedItems</code> list and populate it with two elements:
+						<code class="code">Hammer</code> and <code class="code">Nails</code>. Now you append two more elements
+					to the end of <code class="code">RelatedItems</code>.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "SET #ri = list_append(#ri, :vals)" \
+    --expression-attribute-names '<span>{</span>"#ri": "RelatedItems"}' \
+    --expression-attribute-values file://values.json  \
+    --return-values ALL_NEW</code></pre><p>The arguments for <code class="code">--expression-attribute-values</code> are stored in the
+						<code>values.json</code> file.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (json)--><code class="json "><span>{</span>
+    ":vals": <span>{</span>
+        "L": [
+            <span>{</span> "S": "Screwdriver" },
+            <span>{</span>"S": "Hacksaw" }
+        ]
+    }
+}</code></pre><p>Finally, you append one more element to the <em>beginning</em> of
+						<code class="code">RelatedItems</code>. To do this, swap the order of the
+						<code class="code">list_append</code> elements. (Remember that <code class="code">list_append</code>
+					takes two lists as input and appends the second list to the first.)</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "SET #ri = list_append(:vals, #ri)" \
+    --expression-attribute-names '<span>{</span>"#ri": "RelatedItems"}' \
+    --expression-attribute-values '<span>{</span>":vals": <span>{</span>"L": [ <span>{</span> "S": "Chisel" }]}}' \
+    --return-values ALL_NEW</code></pre><p>The resulting <code class="code">RelatedItems</code> attribute now contains five elements,
+					in the following order: <code class="code">Chisel</code>, <code class="code">Hammer</code>,
+						<code class="code">Nails</code>, <code class="code">Screwdriver</code>, <code class="code">Hacksaw</code>.</p></div></div>
+		 
+		 
+			<h3 id="Expressions.UpdateExpressions.SET.PreventingAttributeOverwrites">Preventing overwrites of an existing attribute</h3>
+			
+			
+			<div class="example"><h6>Example</h6><div class="example-contents"><p>Set the <code class="code">Price</code> of an item, but only if the item does not already
+					have a <code class="code">Price</code> attribute. (If <code class="code">Price</code> already exists,
+					nothing happens.)</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "SET Price = if_not_exists(Price, :p)" \
+    --expression-attribute-values '<span>{</span>":p": <span>{</span>"N": "100"}}' \
+    --return-values ALL_NEW</code></pre></div></div>
+		 
+	 
+		<h2 id="Expressions.UpdateExpressions.REMOVE">REMOVE — deleting attributes from an item</h2>
+
+		<p>Use the <code class="code">REMOVE</code> action in an update expression to remove one or more
+			attributes from an item in Amazon DynamoDB. To perform multiple <code class="code">REMOVE</code> actions,
+			separate them with commas.</p>
+		<p>The following is a syntax summary for <code class="code">REMOVE</code> in an update expression. The
+			only operand is the document path for the attribute that you want to remove.</p>
+		<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight"><b>remove-action</b> ::=
+    <code class="replaceable">path</code></code></pre>
+		<div class="example"><h6>Example</h6><div class="example-contents"><p>Remove some attributes from an item. (If the attributes don't exist, nothing
+				happens.)</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "REMOVE Brand, InStock, QuantityOnHand" \
+    --return-values ALL_NEW</code></pre></div></div>
+		 
+			<h3 id="Expressions.UpdateExpressions.REMOVE.RemovingListElements">Removing elements from a list</h3>
+
+			<p>You can use <code class="code">REMOVE</code> to delete individual elements from a list.</p>
+			<div class="example"><h6>Example</h6><div class="example-contents"><p>In <a href="#Expressions.UpdateExpressions.SET.UpdatingListElements">Appending elements to a list</a>,
+					you modify a list attribute (<code class="code">RelatedItems</code>) so that it contained
+					five elements: </p><div class="itemizedlist">
+					 
+					 
+					 
+					 
+					 
+				<ul class="itemizedlist"><li class="listitem">
+						<p><code class="code">[0]</code>—<code class="code">Chisel</code></p>
+					</li><li class="listitem">
+						<p><code class="code">[1]</code>—<code class="code">Hammer</code></p>
+					</li><li class="listitem">
+						<p><code class="code">[2]</code>—<code class="code">Nails</code></p>
+					</li><li class="listitem">
+						<p><code class="code">[3]</code>—<code class="code">Screwdriver</code></p>
+					</li><li class="listitem">
+						<p><code class="code">[4]</code>—<code class="code">Hacksaw</code></p>
+					</li></ul></div><p>The following AWS Command Line Interface (AWS CLI) example deletes <code class="code">Hammer</code> and
+						<code class="code">Nails</code> from the list.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "REMOVE RelatedItems[1], RelatedItems[2]" \
+    --return-values ALL_NEW</code></pre><p>After <code class="code">Hammer</code> and <code class="code">Nails</code> are removed, the remaining
+					elements are shifted. The list now contains the following:</p><div class="itemizedlist">
+					 
+					 
+					 
+				<ul class="itemizedlist"><li class="listitem">
+						<p><code class="code">[0]</code>—<code class="code">Chisel</code></p>
+					</li><li class="listitem">
+						<p><code class="code">[1]</code>—<code class="code">Screwdriver</code></p>
+					</li><li class="listitem">
+						<p><code class="code">[2]</code>—<code class="code">Hacksaw</code></p>
+					</li></ul></div></div></div>
+		 
+	 
+		<h2 id="Expressions.UpdateExpressions.ADD">ADD — updating numbers and sets</h2>
+
+
+		<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>In general, we recommend using <code class="code">SET</code> rather than
+				<code class="code">ADD</code> to ensure idempotent operations.</p></div></div>
+		<p>Use the <code class="code">ADD</code> action in an update expression to add a new attribute and its
+			values to an item.</p>
+		<p>If the attribute already exists, the behavior of <code class="code">ADD</code> depends on the
+			attribute's data type:</p>
+		<div class="itemizedlist">
+			 
+			 
+		<ul class="itemizedlist"><li class="listitem">
+				<p>If the attribute is a number, and the value you are adding is also a number,
+					the value is mathematically added to the existing attribute. (If the value is a
+					negative number, it is subtracted from the existing attribute.)</p>
+			</li><li class="listitem">
+				<p>If the attribute is a set, and the value you are adding is also a set, the
+					value is appended to the existing set.</p>
+			</li></ul></div>
+
+		<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>The <code class="code">ADD</code> action supports only number and set data types.</p></div></div>
+
+		<p>To perform multiple <code class="code">ADD</code> actions, separate them with commas.</p>
+		<p>In the following syntax summary:</p>
+
+		<div class="itemizedlist">
+			 
+			 
+		<ul class="itemizedlist"><li class="listitem">
+				<p>The <code class="replaceable">path</code> element is the document path to an
+					attribute. The attribute must be either a <code class="code">Number</code> or a set data
+					type. </p>
+			</li><li class="listitem">
+				<p>The <code class="replaceable">value</code> element is a number that you want to add
+					to the attribute (for <code class="code">Number</code> data types), or a set to append to the
+					attribute (for set types).</p>
+			</li></ul></div>
+
+		<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight"><b>add-action</b> ::=
+    <code class="replaceable">path</code> <code class="replaceable">value</code></code></pre>
+		<p>The topics below cover some different use cases for the <code class="code">ADD</code>
+			action.</p>
+		<div class="highlights" id="inline-topiclist"><h6>Topics</h6><ul><li><p><a href="#Expressions.UpdateExpressions.ADD.Number">Adding a number</a></p></li><li><p><a href="#Expressions.UpdateExpressions.ADD.Set">Adding elements to a set</a></p></li></ul></div>
+
+		 
+			<h3 id="Expressions.UpdateExpressions.ADD.Number">Adding a number</h3>
+
+			<p>Assume that the <code class="code">QuantityOnHand</code> attribute does not exist. The
+				following AWS CLI example sets <code class="code">QuantityOnHand</code> to 5.</p>
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "ADD QuantityOnHand :q" \
+    --expression-attribute-values '<span>{</span>":q": <span>{</span>"N": "5"}}' \
+    --return-values ALL_NEW</code></pre>
+			<p>Now that <code class="code">QuantityOnHand</code> exists, you can rerun the example to
+				increment <code class="code">QuantityOnHand</code> by 5 each time.</p>
+		 
+		 
+			<h3 id="Expressions.UpdateExpressions.ADD.Set">Adding elements to a set</h3>
+
+			<p>Assume that the <code class="code">Color</code> attribute does not exist. The following AWS CLI
+				example sets <code class="code">Color</code> to a string set with two elements.</p>
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "ADD Color :c" \
+    --expression-attribute-values '<span>{</span>":c": <span>{</span>"SS":["Orange", "Purple"]}}' \
+    --return-values ALL_NEW</code></pre>
+			<p>Now that <code class="code">Color</code> exists, you can add more elements to it.</p>
+			<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "ADD Color :c" \
+    --expression-attribute-values '<span>{</span>":c": <span>{</span>"SS":["Yellow", "Green", "Blue"]}}' \
+    --return-values ALL_NEW</code></pre>
+		 
+	 
+		<h2 id="Expressions.UpdateExpressions.DELETE">DELETE — removing elements from a set</h2>
+
+		<div class="awsdocs-note awsdocs-important"><div class="awsdocs-note-title"><awsui-icon name="status-warning" variant="error"></awsui-icon><h6>Important</h6></div><div class="awsdocs-note-text"><p>The <code class="code">DELETE</code> action supports only <code class="code">Set</code> data types.</p></div></div>
+		<p>Use the <code class="code">DELETE</code> action in an update expression to remove one or more
+			elements from a set. To perform multiple <code class="code">DELETE</code> actions, separate them with
+			commas.</p>
+		<p>In the following syntax summary:</p>
+		<div class="itemizedlist">
+			 
+			 
+		<ul class="itemizedlist"><li class="listitem">
+				<p>The <code class="replaceable">path</code> element is the document path to an
+					attribute. The attribute must be a set data type.</p>
+			</li><li class="listitem">
+				<p>The <code class="replaceable">subset</code> is one or more elements that you want to
+					delete from <code class="replaceable">path</code>. You must specify
+						<code class="replaceable">subset</code> as a set type.</p>
+			</li></ul></div>
+		<pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight"><b>delete-action</b> ::=
+    <code class="replaceable">path</code> <code class="replaceable">subset</code></code></pre>
+		<div class="example"><h6>Example</h6><div class="example-contents"><p>In <a href="#Expressions.UpdateExpressions.ADD.Set">Adding elements to a set</a>, you create the
+					<code class="code">Color</code> string set. This example removes some of the elements from
+				that set.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "DELETE Color :p" \
+    --expression-attribute-values '<span>{</span>":p": <span>{</span>"SS": ["Yellow", "Purple"]}}' \
+    --return-values ALL_NEW</code></pre></div></div>
+	 
+		<h2 id="Expressions.UpdateExpressions.Multiple">Using multiple update expressions</h2>
+		<p>You can use multiple actions in a single update expression. All attribute references
+			are resolved against the item's state before any of the actions are applied.</p>
+		<div class="example"><h6>Example</h6><div class="example-contents"><p>Given an item <code class="code"><span>{</span>"id": "1", "a": 1, "b": 2, "c": 3}</code>, the following
+				expression removes <code class="code">a</code> and shifts the values of <code class="code">b</code> and
+				<code class="code">c</code>:</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name test \
+    --key '<span>{</span>"id":<span>{</span>"S":"1"}}' \
+    --update-expression "REMOVE a SET b = a, c = b" \
+    --return-values ALL_NEW</code></pre><p>The result is <code class="code"><span>{</span>"id": "1", "b": 1, "c": 2}</code>. Even though
+				<code class="code">a</code> is removed and <code class="code">b</code> is reassigned in the same expression,
+				both references resolve to their original values.</p></div></div>
+		<div class="example"><h6>Example</h6><div class="example-contents"><p>If you want to modify an attribute's value and completely remove another
+				attribute, you could use a SET and a REMOVE action in a single statement. This
+				operation would reduce the <code class="code">Price</code> value to 15 while also removing the
+					<code class="code">InStock</code> attribute from the item.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "SET Price = Price - :p REMOVE InStock" \
+    --expression-attribute-values '<span>{</span>":p": <span>{</span>"N":"15"}}' \
+    --return-values ALL_NEW</code></pre></div></div>
+		<div class="example"><h6>Example</h6><div class="example-contents"><p>If you want to add to a list while also changing another attribute's value, you
+				could use two SET actions in a single statement. This operation would add "Nails" to
+				the <code class="code">RelatedItems</code> list attribute and also set the <code class="code">Price</code>
+				value to 21.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (none)--><code class="nohighlight">aws dynamodb update-item \
+    --table-name ProductCatalog \
+    --key '<span>{</span>"Id":<span>{</span>"N":"789"}}' \
+    --update-expression "SET RelatedItems[1] = :newValue, Price = :newPrice" \
+    --expression-attribute-values '<span>{</span>":newValue": <span>{</span>"S":"Nails"}, ":newPrice": <span>{</span>"N":"21"}}'  \
+    --return-values ALL_NEW</code></pre></div></div>
+	<awsdocs-copyright class="copyright-print"></awsdocs-copyright><awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}"></awsdocs-thumb-feedback></div><noscript><div><div><div><div id="js_error_message"><p><img src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png" alt="Warning" /> <strong>Javascript is disabled or is unavailable in your browser.</strong></p><p>To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.</p></div></div></div></div></noscript><div id="main-col-footer" class="awsui-util-font-size-0"><div id="doc-conventions"><a target="_top" href="/general/latest/gr/docconventions.html">Document Conventions</a></div><div class="prev-next"><div id="previous" class="prev-link" accesskey="p" href="./Expressions.ProjectionExpressions.html">Projection expressions</div><div id="next" class="next-link" accesskey="n" href="./Expressions.OperatorsAndFunctions.html">Condition and filter expressions</div></div></div><awsdocs-page-utilities></awsdocs-page-utilities></div><div id="quick-feedback-yes" style="display: none;"><div class="title">Did this page help you? - Yes</div><div class="content"><p>Thanks for letting us know we're doing a good job!</p><p>If you've got a moment, please tell us what we did right so we can do more of it.</p><p><awsui-button id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback" click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=DynamoDB&amp;topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html"></awsui-button></p></div></div><div id="quick-feedback-no" style="display: none;"><div class="title">Did this page help you? - No</div><div class="content"><p>Thanks for letting us know this page needs work. We're sorry we let you down.</p><p>If you've got a moment, please tell us how we can make the documentation better.</p><p><awsui-button id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback" click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=DynamoDB&amp;topic_url=https://docs.aws.amazon.com/en_us/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html"></awsui-button></p></div></div></div></body></div></awsdocs-view><div class="page-loading-indicator" id="page-loading-indicator"><awsui-spinner size="large"></awsui-spinner></div></div><div id="tools-panel" dom-region="tools"><awsdocs-tools-panel id="awsdocs-tools-panel"></awsdocs-tools-panel></div></awsui-app-layout><awsdocs-cookie-banner class="doc-cookie-banner"></awsdocs-cookie-banner></div></body></html>

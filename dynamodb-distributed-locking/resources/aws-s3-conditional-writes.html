@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>How to prevent object overwrites with conditional writes - Amazon Simple Storage Service</title><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="assets_root" content="/assets" /><meta name="target_state" content="conditional-writes" /><meta name="default_state" content="conditional-writes" /><link rel="icon" type="image/ico" href="/assets/images/favicon.ico" /><link rel="shortcut icon" type="image/ico" href="/assets/images/favicon.ico" /><link rel="canonical" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes.html" /><link rel="alternate" type="text/markdown" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes.md" title="Markdown version" /><meta name="description" content="conditional requests are included in header fields and test a precondition before doing some S3 operations." /><meta name="deployment_region" content="IAD" /><meta name="product" content="Amazon Simple Storage Service" /><meta name="guide" content="User Guide" /><meta name="abstract" content="Learn how to use Amazon Simple Storage Service (Amazon S3) to store and retrieve any amount of data from anywhere. This guide explains Amazon S3 concepts, such as buckets, objects, and related configurations, and includes code examples for common operations." /><meta name="guide-locale" content="en_us" /><meta name="tocs" content="toc-contents.json" /><link rel="canonical" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes.html" /><link rel="alternate" href="https://docs.aws.amazon.com/id_id/AmazonS3/latest/userguide/conditional-writes.html" hreflang="id-id" /><link rel="alternate" href="https://docs.aws.amazon.com/id_id/AmazonS3/latest/userguide/conditional-writes.html" hreflang="id" /><link rel="alternate" href="https://docs.aws.amazon.com/de_de/AmazonS3/latest/userguide/conditional-writes.html" hreflang="de-de" /><link rel="alternate" href="https://docs.aws.amazon.com/de_de/AmazonS3/latest/userguide/conditional-writes.html" hreflang="de" /><link rel="alternate" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes.html" hreflang="en-us" /><link rel="alternate" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes.html" hreflang="en" /><link rel="alternate" href="https://docs.aws.amazon.com/es_es/AmazonS3/latest/userguide/conditional-writes.html" hreflang="es-es" /><link rel="alternate" href="https://docs.aws.amazon.com/es_es/AmazonS3/latest/userguide/conditional-writes.html" hreflang="es" /><link rel="alternate" href="https://docs.aws.amazon.com/fr_fr/AmazonS3/latest/userguide/conditional-writes.html" hreflang="fr-fr" /><link rel="alternate" href="https://docs.aws.amazon.com/fr_fr/AmazonS3/latest/userguide/conditional-writes.html" hreflang="fr" /><link rel="alternate" href="https://docs.aws.amazon.com/it_it/AmazonS3/latest/userguide/conditional-writes.html" hreflang="it-it" /><link rel="alternate" href="https://docs.aws.amazon.com/it_it/AmazonS3/latest/userguide/conditional-writes.html" hreflang="it" /><link rel="alternate" href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/conditional-writes.html" hreflang="ja-jp" /><link rel="alternate" href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/conditional-writes.html" hreflang="ja" /><link rel="alternate" href="https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/userguide/conditional-writes.html" hreflang="ko-kr" /><link rel="alternate" href="https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/userguide/conditional-writes.html" hreflang="ko" /><link rel="alternate" href="https://docs.aws.amazon.com/pt_br/AmazonS3/latest/userguide/conditional-writes.html" hreflang="pt-br" /><link rel="alternate" href="https://docs.aws.amazon.com/pt_br/AmazonS3/latest/userguide/conditional-writes.html" hreflang="pt" /><link rel="alternate" href="https://docs.aws.amazon.com/zh_cn/AmazonS3/latest/userguide/conditional-writes.html" hreflang="zh-cn" /><link rel="alternate" href="https://docs.aws.amazon.com/zh_tw/AmazonS3/latest/userguide/conditional-writes.html" hreflang="zh-tw" /><link rel="alternate" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes.html" hreflang="x-default" /><meta name="feedback-item" content="S3" /><meta name="this_doc_product" content="Amazon Simple Storage Service" /><meta name="this_doc_guide" content="User Guide" /><head xmlns="http://www.w3.org/1999/xhtml"> <script defer="" src="/assets/r/awsdocs-doc-page.2.0.0.js"></script><link href="/assets/r/awsdocs-doc-page.2.0.0.css" rel="stylesheet"/></head>
+<script defer="" id="awsc-panorama-bundle" type="text/javascript" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'s3'}"></script><meta id="panorama-serviceSubSection" value="User Guide" /><meta id="panorama-serviceConsolePage" value="How to prevent object overwrites with conditional writes" /></head><body class="awsdocs awsui"><div class="awsdocs-container"><p><a href="conditional-writes.md">View a markdown version of this page</a></p><awsdocs-header></awsdocs-header><awsui-app-layout id="app-layout" class="awsui-util-no-gutters" ng-controller="ContentController as $ctrl" header-selector="awsdocs-header" navigation-hide="false" navigation-width="$ctrl.navWidth" navigation-open="$ctrl.navOpen" navigation-change="$ctrl.onNavChange($event)" tools-hide="$ctrl.hideTools" tools-width="$ctrl.toolsWidth" tools-open="$ctrl.toolsOpen" tools-change="$ctrl.onToolsChange($event)"><div id="guide-toc" dom-region="navigation"><awsdocs-toc></awsdocs-toc></div><div id="main-column" dom-region="content" tabindex="-1"><awsdocs-view class="awsdocs-view"><div id="awsdocs-content"><head><title>How to prevent object overwrites with conditional writes - Amazon Simple Storage Service</title><meta name="pdf" content="/pdfs/AmazonS3/latest/userguide/s3-userguide.pdf#conditional-writes" /><meta name="rss" content="s3-userguide-rss-updates.rss" /><meta name="forums" content="https://repost.aws/tags/TADSTjraA0Q4-a1dxk6eUYaw" /><meta name="feedback" content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=S3&amp;topic_url=https://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/conditional-writes.html" /><meta name="feedback-yes" content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/conditional-writes.html" /><meta name="feedback-no" content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/conditional-writes.html" /><meta name="keywords" content="S3,Amazon S3,S3 User Guide,Amazon S3 User Guide,Amazon User Guide,s3 bucket,s3 object,cloud storage,data storage,Amazon S3 objects,What is an object,How to use objects,Conditional requests,Conditional reads,Conditional writes,prevent object overwrites,upload object if no matching key name,check object ETag on upload" /><script type="application/ld+json">
+{
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Amazon Simple Storage Service (S3)",
+        "item" : "https://docs.aws.amazon.com/s3/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "User Guide",
+        "item" : "https://docs.aws.amazon.com/AmazonS3/latest/userguide"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Working with objects in Amazon S3",
+        "item" : "https://docs.aws.amazon.com/AmazonS3/latest/userguide/uploading-downloading-objects.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Add preconditions to S3 operations with conditional requests",
+        "item" : "https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-requests.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "How to prevent object overwrites with conditional writes",
+        "item" : "https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-requests.html"
+      }
+    ]
+}
+</script></head><body><div id="main"><div style="display: none"><a href="/pdfs/AmazonS3/latest/userguide/s3-userguide.pdf#conditional-writes" target="_blank" rel="noopener noreferrer" title="Open PDF"></a></div><div id="breadcrumbs" class="breadcrumb"><a href="/index.html">Documentation</a><a href="/s3/index.html">Amazon Simple Storage Service (S3)</a><a href="Welcome.html">User Guide</a></div><div id="page-toc-src"><a href="#conditional-write-key-names">How to prevent object overwrites based on key names</a><a href="#conditional-write-etags">How to prevent overwrites if the object has changed</a><a href="#conditional-error-response">Conditional write behavior</a><a href="#conditional-write-scenarios">Conditional write scenarios</a></div><div id="main-content" class="awsui-util-container"><div id="main-col-body"><awsdocs-language-banner data-service="$ctrl.pageService"></awsdocs-language-banner><h1 class="topictitle" id="conditional-writes">How to prevent object overwrites with conditional writes</h1><div class="awsdocs-page-header-container"><awsdocs-page-header></awsdocs-page-header><awsdocs-filter-selector id="awsdocs-filter-selector"></awsdocs-filter-selector></div><p>By using conditional writes, you can add an additional header to your <code class="code">WRITE</code> requests
+        to specify preconditions for your Amazon S3 operation. To conditionally write objects, add the
+        HTTP <code class="code">If-None-Match</code> or <code class="code">If-Match</code> header.</p><p>The <code class="code">If-None-Match</code> header prevents overwrites of existing data by validating
+        that there's not an object with the same key name already in your bucket.</p><p>Alternatively, you can add the <code class="code">If-Match</code> header to check an object's entity
+        tag (ETag) before writing an object. With this header, Amazon S3 compares the provided ETag value
+        with the ETag value of the object in S3. If the ETag values don't match, the operation
+        fails.</p><p>Bucket owners can use bucket policies to enforce conditional writes for uploaded objects. For
+        more information, see <a href="./conditional-writes-enforce.html">Enforce conditional writes on Amazon S3 buckets</a>.</p><div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>To use conditional writes, you must use AWS Signature Version 4 to sign the
+            request.</p></div></div><div class="highlights"><h6>Topics</h6><ul><li><p><a href="#conditional-write-key-names">How to prevent object overwrites based on key names</a></p></li><li><p><a href="#conditional-write-etags">How to prevent overwrites if the object has changed</a></p></li><li><p><a href="#conditional-error-response">Conditional write behavior</a></p></li><li><p><a href="#conditional-write-scenarios">Conditional write scenarios</a></p></li><li><p><a href="./conditional-writes-enforce.html">Enforce conditional writes on Amazon S3 buckets</a></p></li></ul></div>
+        <h2 id="conditional-write-key-names">How to prevent object overwrites based on key names</h2>
+        <p>You can use the HTTP <code class="code">If-None-Match</code> conditional header to check whether an
+            object already exists in the specified bucket based on its key name before creating it
+            or copying it to the destination bucket.</p>
+        
+        <p>Conditional writes with the HTTP <code class="code">If-None-Match</code> header check for
+            the existence of an object during the <code class="code">WRITE</code> operation. If an identical key
+            name is found in the bucket, the operation fails. Without the HTTP
+                <code class="code">If-None-Match</code> header, if you upload or copy an object with an identical
+            key name in an unversioned or version-suspended bucket, the object is overwritten. For
+            more information about using key names, see <a href="./object-keys.html">Naming Amazon S3 objects</a>.</p>
+        
+        <div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>The HTTP <code class="code">If-None-Match</code> header only applies to the current version of an object in a version bucket.</p></div></div>
+        
+        <p>To perform conditional writes with the HTTP <code class="code">If-None-Match</code> header you must have
+            the <code class="code">s3:PutObject</code> permission. This enables the caller to check for the
+            presence of objects in the bucket. The <code class="code">If-None-Match</code> header expects the *
+            (asterisk) value.</p>
+        <p>You can use the <code class="code">If-None-Match</code> header with the following APIs:</p>
+        <div class="itemizedlist">
+             
+             
+             
+        <ul class="itemizedlist"><li class="listitem">
+                <p><a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html">PutObject</a></p>
+            </li><li class="listitem">
+                <p><a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_CompleteMultipartUpload.html">CompleteMultipartUpload</a></p>
+            </li><li class="listitem">
+                <p><a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html">CopyObject</a></p>
+            </li></ul></div>
+        <div class="collapsible" data-expand-section="_collapse_all_"><awsui-expandable-section variant="container" header="Conditional Put Using the AWS CLI" id="conditional-writes-putobject-CLI-key-names" expanded="false"><p>The following <code class="code">put-object</code> example command attempts to perform a
+                    conditional write for an object with the key name
+                        <code>dir-1/my_images.tar.bz2</code>.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (bash)--><code class="bash ">aws s3api put-object --bucket <code class="replaceable">amzn-s3-demo-bucket</code> --key dir-1/my_images.tar.bz2 --body my_images.tar.bz2 --if-none-match "*"       </code></pre><p>For more information, see <a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/put-object.html" rel="noopener noreferrer" target="_blank"><span>put-object</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a> in the <em>AWS CLI Command Reference</em>.</p><p>For information about the AWS CLI, see <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html">What
+                        is the AWS Command Line Interface?</a> in the <em>AWS Command Line Interface User Guide</em>. </p></awsui-expandable-section><awsui-expandable-section variant="container" header="Conditional Copy Using the AWS CLI" id="conditional-writes-copyobject-CLI-key-names" expanded="false"><p>The following <code class="code">copy-object</code> example command attempts to copy an object to a destination bucket with a
+                    conditional write for an object with the key name
+                    <code>dir-1/my_images.tar.bz2</code>.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (bash)--><code class="bash ">aws s3api copy-object --copy-source <code class="replaceable">amzn-s3-demo-bucket</code>/key --key dir-1/my_images.tar.bz2 --bucket <code class="replaceable">amzn-s3-demo-bucket2</code> --if-none-match "*"            </code></pre><p>For more information, see <a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/copy-object.html" rel="noopener noreferrer" target="_blank"><span>copy-object</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a> in the <em>AWS CLI Command Reference</em>.</p><p>For information about the AWS CLI, see <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html">What
+                        is the AWS Command Line Interface?</a> in the <em>AWS Command Line Interface User Guide</em>. </p></awsui-expandable-section><awsui-expandable-section variant="container" header="Conditional multipart upload Using the AWS CLI" id="conditional-writes-mpu-complete-CLI-key-names" expanded="false"><p>The following <code class="code">complete-multipart-upload</code> example command attempts to complete a multipart upload with a conditional write for an object with the key name
+                    <code>dir-1/my_images.tar.bz2</code>. In this example, the
+                    file:// prefix is used to load the JSON structure from a file in the local
+                    folder named <code>mpustruct</code> which list of all the parts that
+                    have been uploaded for tnis specific multipart upload.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (bash)--><code class="bash ">aws s3api complete-multipart-upload --multipart-upload file://mpustruct --bucket <code class="replaceable">amzn-s3-demo-bucket</code> --key dir-1/my_images.tar.bz2 --upload-id <code class="replaceable">upload-id</code>  --if-none-match "*"             </code></pre><p>For more information, see <a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/complete-multipart-upload.html" rel="noopener noreferrer" target="_blank"><span>complete-multipart-upload</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a> in the <em>AWS CLI Command Reference</em>.</p><p>For information about the AWS CLI, see <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html">What
+                        is the AWS Command Line Interface?</a> in the <em>AWS Command Line Interface User Guide</em>. </p></awsui-expandable-section></div>
+     
+        <h2 id="conditional-write-etags">How to prevent overwrites if the object has changed</h2>
+        <p>An object's ETag is a string that's unique to the object and reflects a change to the
+            object's content. You can use the <code class="code">If-Match</code> header to compare the ETag value
+            of an object in an Amazon S3 bucket with one that you provide during the <code class="code">WRITE</code>
+            operation. If the ETag values don't match, the operation fails. For more information
+            about ETags, see <a href="./checking-object-integrity-upload.html#checking-object-integrity-etag-and-md5">Using Content-MD5 and the ETag to verify uploaded objects</a>.</p>
+        <p>To perform conditional writes with an HTTP <code class="code">If-Match</code> header you must have the
+                <code class="code">s3:PutObject</code> and <code class="code">s3:GetObject</code> permissions. This enables
+            the caller to check the ETag and verify the state of the objects in the bucket. The
+                <code class="code">If-Match</code> header expects the ETag value as a string.</p>
+        <p>You can use the <code class="code">If-Match</code> header with the following APIs:</p>
+        <div class="itemizedlist">
+             
+             
+             
+        <ul class="itemizedlist"><li class="listitem">
+                <p><a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html">PutObject</a></p>
+            </li><li class="listitem">
+                <p><a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_CompleteMultipartUpload.html">CompleteMultipartUpload</a></p>
+            </li><li class="listitem">
+                <p><a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html">CopyObject</a></p>
+            </li></ul></div>
+        <div class="collapsible" data-expand-section="_collapse_all_"><awsui-expandable-section variant="container" header="Conditional Put Using the AWS CLI" id="conditional-writes-putobject-CLI-etags" expanded="false"><p>The following <code class="code">put-object</code> example command attempts to perform a
+                    conditional write with the provided ETag value
+                        <code>6805f2cfc46c0f04559748bb039d69ae</code>.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (bash)--><code class="bash ">aws s3api put-object --bucket <code class="replaceable">amzn-s3-demo-bucket</code> --key dir-1/my_images.tar.bz2 --body my_images.tar.bz2 --if-match "<code class="replaceable">6805f2cfc46c0f04559748bb039d69ae</code>"         </code></pre><p>For more information, see <a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/put-object.html" rel="noopener noreferrer" target="_blank"><span>put-object</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a> in the <em>AWS CLI Command Reference</em>.</p><p>For information about the AWS CLI, see <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html">What
+                        is the AWS Command Line Interface?</a> in the <em>AWS Command Line Interface User Guide</em>. </p></awsui-expandable-section><awsui-expandable-section variant="container" header="Conditional Copy Using the AWS CLI" id="conditional-writes-copyobject-CLI-etags" expanded="false"><p>The following <code class="code">copy-object</code> example command attempts to perform a
+                    conditional write with the provided ETag value
+                    <code>6805f2cfc46c0f04559748bb039d69ae</code>.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (bash)--><code class="bash ">aws s3api copy-object --copy-source <code class="replaceable">amzn-s3-demo-bucket</code>/key --key dir-1/my_images.tar.bz2 --bucket <code class="replaceable">amzn-s3-demo-bucket2</code> --if-match "<code class="replaceable">6805f2cfc46c0f04559748bb039d69ae</code>"             </code></pre><p>For more information, see <a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/copy-object.html" rel="noopener noreferrer" target="_blank"><span>copy-object</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a> in the <em>AWS CLI Command Reference</em>.</p><p>For information about the AWS CLI, see <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html">What
+                        is the AWS Command Line Interface?</a> in the <em>AWS Command Line Interface User Guide</em>. </p></awsui-expandable-section><awsui-expandable-section variant="container" header="Conditional multipart upload Using the AWS CLI" id="conditional-writes-mpu-complete-CLI-etags" expanded="false"><p>The following <code class="code">complete-multipart-upload</code> example command attempts
+                    to complete a multipart upload with a conditional write using the provided ETag value
+                        <code>6805f2cfc46c0f04559748bb039d69ae</code>. In this example, the
+                    file:// prefix is used to load the JSON structure from a file in the local
+                    folder named <code>mpustruct</code> which list of all the parts that
+                    have been uploaded for tnis specific multipart upload.</p><pre class="programlisting"><div class="code-btn-container"><div class="btn-copy-code" title="Copy"><awsui-icon name="copy"></awsui-icon></div></div><!--DEBUG: cli (bash)--><code class="bash ">aws s3api complete-multipart-upload --multipart-upload file://mpustruct --bucket <code class="replaceable">amzn-s3-demo-bucket</code> --key dir-1/my_images.tar.bz2 --upload-id <code class="replaceable">upload-id</code> --if-match "<code class="replaceable">6805f2cfc46c0f04559748bb039d69ae</code>"             </code></pre><p>For more information, see <a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/complete-multipart-upload.html" rel="noopener noreferrer" target="_blank"><span>complete-multipart-upload</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a> in the <em>AWS CLI Command Reference</em>.</p><p>For information about the AWS CLI, see <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html">What
+                        is the AWS Command Line Interface?</a> in the <em>AWS Command Line Interface User Guide</em>. </p></awsui-expandable-section></div>
+     
+        <h2 id="conditional-error-response">Conditional write behavior</h2>
+        <div class="variablelist">           
+             
+             
+        <dl>
+                <dt><b><span class="term">Conditional writes or copies with <code class="code">If-None-Match</code> header</span></b></dt>
+                <dd>
+                    <p>Conditional writes with the <code class="code">If-None-Match</code> header evaluate
+                        against existing objects in a bucket. If there's no existing object with the
+                        same key name in the bucket, the write operation succeeds, resulting in a
+                            <code class="code">200 OK</code> response. If there's an existing object, the write
+                        operation fails, resulting in a <code class="code">412 Precondition Failed</code>
+                        response.</p>
+                    <p>For buckets with versioning enabled, if there's no current object version
+                        with the same name, or if the current object version is a delete marker, the
+                        write operation succeeds. Otherwise, it results in a failed write operation
+                        with a <code class="code">412 Precondition Failed</code> response.</p> 
+                    <p>If multiple conditional writes or copies occur for the same object name, the first write
+                        operation to finish succeeds. Amazon S3 then fails subsequent writes with a
+                            <code class="code">412 Precondition Failed</code> response.</p>
+                    <p>You can also receive a <code class="code">409 Conflict</code> response in the case of
+                        concurrent requests if a delete request to an object succeeds before a
+                        conditional write operation on that object completes. When using conditional writes
+                        with <code class="code">PutObject</code>, uploads may be retried after receiving a
+                            <code class="code">409 Conflict</code> error. When using
+                            <code class="code">CompleteMultipartUpload</code>, the entire multipart upload must be
+                        re-initiated with <code class="code">CreateMultipartUpload</code> to upload the object
+                        again after receiving a <code class="code">409 Conflict</code> error.</p>
+                </dd>
+            
+                <dt><b><span class="term">Conditional writes or copies with <code class="code">If-Match</code> header</span></b></dt>
+                <dd>
+                    <p>The <code class="code">If-Match</code> header evaluates against existing objects in a
+                        bucket. If there's an existing object with the same key name and matching
+                        ETag,  the write operation succeeds, resulting in a <code class="code">200 OK</code>
+                        response. If the ETag doesn't match, the write operation fails with a
+                            <code class="code">412 Precondition Failed</code> response.</p>
+                    
+                    <p>You can also receive a <code class="code">409 Conflict</code> response in the case of
+                        concurrent requests.</p>
+                    
+                    <p>You will receive a <code class="code">404 Not Found</code> response if a concurrent
+                        delete request to an object succeeds before a conditional write operation on
+                        that object completes, as the object key no longer exists. You should
+                        reupload the object when you receive a <code class="code">404 Not Found</code>
+                        response.</p>
+                    
+                    <p>If there's no current object version with the same name, or if the current
+                        object version is a delete marker, the operation fails with a <code class="code">404 Not
+                            Found</code> error.</p>
+                </dd>
+            </dl></div>
+     
+        <h2 id="conditional-write-scenarios">Conditional write scenarios</h2>
+        <p>Consider the following scenarios where two clients are running operations on the same
+            bucket. </p>
+         
+            <h6>Conditional writes during multipart uploads</h6>
+            <p>Conditional writes do not consider any in-progress multipart uploads requests since
+                those are not yet fully written objects. Consider the following example where Client
+                1 is uploading an object using multipart upload. During the multipart upload, Client 2 is able to
+                successfully write the same object with the conditional write operation. Subsequently, when
+                Client 1 tries to complete the multipart upload using a conditional write the upload fails.</p>
+         
+        <div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>This scenario will result in a <code class="code">412 Precondition Failed</code> response for both <code class="code">If-None-Match</code> and <code class="code">If-Match</code> headers.</p></div></div>
+        <p>The following example shows two clients writing items with the same key name. One with
+            UploadPart for MPU and one with PutObject and a conditional write. The CompleteMultipartUpload
+            operation, which starts after, fails.</p>
+        <div class="mediaobject">
+             
+                <img src="/images/AmazonS3/latest/userguide/images/conwrite_put_mpu.png" class="aws-docs-img-whiteBg aws-docs-img-padding aws-docs-img-filter" alt="Two clients write to the same key using UploadPart and conditional PutObject. CompleteMultipartUpload fails." />
+             
+             
+        </div>
+         
+            <h6>Concurrent deletes during multipart uploads</h6>
+            <p>If a delete request succeeds before a conditional write request can complete, Amazon S3
+                returns a <code class="code">409 Conflict</code> or <code class="code">404 Not Found</code> response for the
+                write operation. This is because the delete request that was initiated earlier takes
+                precedence over the conditional write operation. In such cases, you must initiate a
+                new multipart upload.</p>
+         
+        <div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>This scenario will result in a <code class="code">409 Conflict</code> response for an
+                    <code class="code">If-None-Match</code> header and a <code class="code">404 Not Found</code> response for
+                an <code class="code">If-Match</code> header.</p></div></div>
+        <p>The following example shows two clients, one using multipart upload and one sending a
+            delete request after the MPU has started. The delete request finishes before the
+            conditional write starts.</p>
+        <div class="mediaobject">
+             
+                <img src="/images/AmazonS3/latest/userguide/images/conwrite_delete_mpu.png" class="aws-docs-img-whiteBg aws-docs-img-padding aws-docs-img-filter" alt="One client uses MPU and another sends a delete request. The delete completes before the conditional write starts." />
+             
+             
+        </div>
+        <div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>To minimize your storage costs, we recommend that you configure a lifecycle rule
+                to delete incomplete multipart uploads after a specified number of days by using the
+                    <code class="code">AbortIncompleteMultipartUpload</code> action. For more information about
+                creating a lifecycle rule to delete incomplete multipart uploads, see <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpu-abort-incomplete-mpu-lifecycle-config.html">Configuring a
+                    bucket lifecycle configuration to delete incomplete multipart
+                uploads</a>.</p></div></div>
+    <awsdocs-copyright class="copyright-print"></awsdocs-copyright><awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}"></awsdocs-thumb-feedback></div><noscript><div><div><div><div id="js_error_message"><p><img src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png" alt="Warning" /> <strong>Javascript is disabled or is unavailable in your browser.</strong></p><p>To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.</p></div></div></div></div></noscript><div id="main-col-footer" class="awsui-util-font-size-0"><div id="doc-conventions"><a target="_top" href="/general/latest/gr/docconventions.html">Document Conventions</a></div><div class="prev-next"><div id="previous" class="prev-link" accesskey="p" href="./conditional-reads.html">How to retrieve or copy objects based on metadata</div><div id="next" class="next-link" accesskey="n" href="./conditional-writes-enforce.html">Enforce conditional writes</div></div></div><awsdocs-page-utilities></awsdocs-page-utilities></div><div id="quick-feedback-yes" style="display: none;"><div class="title">Did this page help you? - Yes</div><div class="content"><p>Thanks for letting us know we're doing a good job!</p><p>If you've got a moment, please tell us what we did right so we can do more of it.</p><p><awsui-button id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback" click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=S3&amp;topic_url=https://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/conditional-writes.html"></awsui-button></p></div></div><div id="quick-feedback-no" style="display: none;"><div class="title">Did this page help you? - No</div><div class="content"><p>Thanks for letting us know this page needs work. We're sorry we let you down.</p><p>If you've got a moment, please tell us how we can make the documentation better.</p><p><awsui-button id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback" click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=S3&amp;topic_url=https://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/conditional-writes.html"></awsui-button></p></div></div></div></body></div></awsdocs-view><div class="page-loading-indicator" id="page-loading-indicator"><awsui-spinner size="large"></awsui-spinner></div></div><div id="tools-panel" dom-region="tools"><awsdocs-tools-panel id="awsdocs-tools-panel"></awsdocs-tools-panel></div></awsui-app-layout><awsdocs-cookie-banner class="doc-cookie-banner"></awsdocs-cookie-banner></div></body></html>
