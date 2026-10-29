@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Focused, interactive lessons on software engineering and distributed systems.">
+  <title>Learn — Interactive lessons</title>
+  <style>
+    :root {
+      --paper: #f7f5ef;
+      --ink: #202522;
+      --muted: #626a64;
+      --line: #d9d8cf;
+      --accent: #136f63;
+      --accent-soft: #e0eee9;
+      --card: #fffdf8;
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 17px;
+      line-height: 1.65;
+    }
+    main { width: min(880px, calc(100% - 40px)); margin: 0 auto; padding: 64px 0 72px; }
+    a { color: var(--accent); text-underline-offset: 3px; }
+    .eyebrow { color: var(--accent); font-size: .75rem; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; }
+    h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; line-height: 1.15; }
+    h1 { font-size: clamp(2.6rem, 8vw, 4.5rem); font-weight: 500; letter-spacing: -.045em; margin: 12px 0 18px; }
+    h2 { font-size: 1.7rem; font-weight: 500; margin: 0; }
+    h3 { font-size: 1.35rem; font-weight: 500; margin: 0 0 8px; }
+    p { margin: 0 0 18px; }
+    .intro { border-bottom: 1px solid var(--line); padding-bottom: 40px; margin-bottom: 42px; }
+    .intro p { color: var(--muted); font-size: 1.12rem; max-width: 620px; margin-bottom: 0; }
+    .course-header { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 12px; }
+    .course-meta { color: var(--muted); font-size: .82rem; white-space: nowrap; }
+    .course-description { color: var(--muted); max-width: 690px; margin-bottom: 26px; }
+    .lessons { display: grid; gap: 12px; list-style: none; margin: 0; padding: 0; }
+    .lesson { display: grid; grid-template-columns: 48px 1fr 24px; gap: 18px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 10px; color: inherit; padding: 22px; text-decoration: none; transition: border-color .15s, transform .15s; }
+    .lesson:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .lesson:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .lesson-number { align-self: start; color: var(--accent); font-family: Georgia, "Times New Roman", serif; font-size: 1.7rem; line-height: 1.2; }
+    .lesson p { color: var(--muted); font-size: .94rem; margin-bottom: 10px; }
+    .lesson-meta { color: var(--muted); font-size: .78rem; }
+    .arrow { color: var(--accent); font-size: 1.5rem; }
+    .references { border-top: 1px solid var(--line); margin-top: 42px; padding-top: 28px; }
+    .references h2 { font-size: 1.35rem; margin-bottom: 12px; }
+    .references ul { display: flex; flex-wrap: wrap; gap: 10px 24px; list-style: none; margin: 0; padding: 0; }
+    .references a { font-size: .92rem; }
+    footer { color: var(--muted); font-size: .82rem; margin-top: 52px; }
+
+    @media (max-width: 600px) {
+      main { width: min(100% - 28px, 880px); padding: 36px 0 48px; }
+      .course-header { align-items: start; flex-direction: column; gap: 8px; }
+      .lesson { grid-template-columns: 32px 1fr; gap: 12px; padding: 18px 16px; }
+      .arrow { display: none; }
+      .references ul { display: grid; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header class="intro">
+    <div class="eyebrow">Learning sessions</div>
+    <h1>Learn by building.</h1>
+    <p>Focused, interactive lessons that turn difficult engineering concepts into practical understanding.</p>
+  </header>
+
+  <section aria-labelledby="course-title">
+    <div class="course-header">
+      <h2 id="course-title">DynamoDB Distributed Locking</h2>
+      <div class="course-meta">4 lessons · 35 minutes</div>
+    </div>
+    <p class="course-description">Build a distributed lock in Python with boto3, then learn why leases alone cannot protect a shared resource—and how to choose a strategy that can.</p>
+
+    <ol class="lessons">
+      <li>
+        <a class="lesson" href="dynamodb-distributed-locking/lessons/0001-acquire-and-release.html">
+          <span class="lesson-number">01</span>
+          <div>
+            <h3>Acquire without stealing. Release without deleting.</h3>
+            <p>Use conditional writes so one caller wins acquisition and only the current owner can release the lock.</p>
+            <span class="lesson-meta">6 minutes · Python + boto3</span>
+          </div>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+      <li>
+        <a class="lesson" href="dynamodb-distributed-locking/lessons/0002-lease-renewal.html">
+          <span class="lesson-number">02</span>
+          <div>
+            <h3>Renew only a lease you still own.</h3>
+            <p>Add a heartbeat that extends a live lease without resurrecting an expired lock or overwriting a successor.</p>
+            <span class="lesson-meta">6 minutes · Python + boto3</span>
+          </div>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+      <li>
+        <a class="lesson" href="dynamodb-distributed-locking/lessons/0003-fencing-tokens.html">
+          <span class="lesson-number">03</span>
+          <div>
+            <h3>Make stale writes lose.</h3>
+            <p>Issue an increasing fencing token on every acquisition, then let the protected resource reject old holders.</p>
+            <span class="lesson-meta">8 minutes · Python + boto3</span>
+          </div>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+      <li>
+        <a class="lesson" href="dynamodb-distributed-locking/lessons/0004-resource-safety-strategies.html">
+          <span class="lesson-number">04</span>
+          <div>
+            <h3>Choose where correctness lives.</h3>
+            <p>Choose fencing, compare-and-swap, transactions, serialization, idempotency, or best-effort locking based on the guarantees your resource can enforce.</p>
+            <span class="lesson-meta">15 minutes · Design strategy</span>
+          </div>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+    </ol>
+  </section>
+
+  <section class="references" aria-labelledby="references-title">
+    <h2 id="references-title">Quick references</h2>
+    <ul>
+      <li><a href="dynamodb-distributed-locking/reference/lock-protocol.html">Lock protocol</a></li>
+      <li><a href="dynamodb-distributed-locking/reference/lease-renewal.html">Lease renewal</a></li>
+      <li><a href="dynamodb-distributed-locking/reference/fencing-tokens.html">Fencing tokens</a></li>
+    </ul>
+  </section>
+
+  <footer>
+    <a href="https://github.com/isbhargav/learn">View this project on GitHub</a>
+  </footer>
+</main>
+</body>
+</html>
